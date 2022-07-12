@@ -20,10 +20,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     private void resize(int size){
         int newStart = (size - realSize) / 2;
         T[] newItems = (T[]) new Object[size];
-        System.arraycopy(items, 0, newItems, newStart, realSize);
+        System.arraycopy(items, start+1, newItems, newStart, realSize);
         allSize = size;
-        start = newStart;
-        end = newStart + realSize + 1;
+        start = newStart-1;
+        end = newStart + realSize;
         items = newItems;
     }
 
@@ -44,7 +44,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
             resize((int) (allSize * 1.6));
         }
         items[end] = t;
-        start += 1;
+        end += 1;
         realSize += 1;
     }
 
@@ -73,8 +73,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         start += 1;
         T result = items[start];
         realSize -= 1;
-        if (allSize / realSize >= 4)
-            resize(allSize/2);
+        if ((allSize > 100) && (allSize / realSize >= 4))
+            resize(allSize / ((allSize / realSize)/2));
         return result;
     }
 
@@ -85,8 +85,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         end -= 1;
         T result = items[end];
         realSize -= 1;
-        if (allSize / realSize >= 4)
-            resize(allSize/2);
+        if ((allSize > 100) && (allSize / realSize >= 4))
+            resize(allSize / ((allSize / realSize)/2));
         return result;
     }
 
