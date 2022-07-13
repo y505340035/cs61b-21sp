@@ -201,4 +201,35 @@ public class ArrayDequeTest {
             }
         }
     }
+
+    @Test
+    public void randomizedEqualsTest(){
+        LinkedListDeque<Integer> L = new LinkedListDeque<>();
+        ArrayDeque<Integer> B = new ArrayDeque<>();
+
+        int N = 500;
+//        for (int i = 0; i < N; i += 1) {
+//            int operationNumber = StdRandom.uniform(0, 3);
+//            if (operationNumber == 0) {
+//                // addLast
+//                int randVal = StdRandom.uniform(0, 100);
+//                L.addLast(randVal);
+//                B.addLast(randVal);
+//            } else if (operationNumber == 1) {
+//                // isEmpty
+//                assertEquals(L.isEmpty(), B.isEmpty());
+//            } else if (operationNumber == 2) {
+//                //removeLast
+//                Integer last = L.removeLast();
+//                Integer Blast = B.removeLast();
+//                assertEquals(last, Blast);
+//            }
+//        }
+
+        for (int i = 0; i < N; i++) {
+            L.addFirst(i);
+            B.addFirst(i);
+            assertEquals(true, L.equals(B));
+        }
+    }
 }

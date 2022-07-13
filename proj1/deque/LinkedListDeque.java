@@ -150,7 +150,7 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
                 return false;
             }
             nodeThis = get(i);
-            nodeO = ((ArrayDeque<T>) o).get(i);
+            nodeO = ((Deque<T>) o).get(i);
         }
         return true;
     }

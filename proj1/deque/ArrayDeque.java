@@ -2,7 +2,7 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private T[] items;
     private int realSize;
     private int allSize;
@@ -55,7 +55,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     @Override
     public void printDeque() {
-        for(int i = start + 1 ; i < end ; i++) {
+        for (int i = start + 1; i < end; i++) {
             System.out.print(items[i] + " ");
         }
         System.out.println("");
@@ -69,8 +69,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         start += 1;
         T result = items[start];
         realSize -= 1;
-        if ((allSize > 100) && (allSize / realSize >= 4))
-            resize(allSize / ((allSize / realSize) / 2));
+        if ((allSize > 100) && (allSize / (realSize + 1) >= 4)) {
+            resize(allSize / ((allSize / (realSize + 1)) / 2));
+        }
         return result;
     }
 
@@ -82,8 +83,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         end -= 1;
         T result = items[end];
         realSize -= 1;
-        if ((allSize > 100) && (allSize / realSize >= 4))
-            resize(allSize / ((allSize / realSize) / 2));
+        if ((allSize > 100) && (allSize / (realSize + 1) >= 4)) {
+            resize(allSize / ((allSize / (realSize + 1)) / 2));
+        }
         return result;
     }
 
@@ -121,7 +123,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     @Override
     public boolean equals(Object o) {
-        if ((!(o instanceof Deque)) || (size() != ((Deque<?>) o).size())) {
+        if ((!(o instanceof Deque)) || (size() != ((Deque<T>) o).size())) {
             return false;
         }
         T nodeThis = get(0);
