@@ -9,7 +9,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     private int start;
     private int end;
 
-    public ArrayDeque(){
+    public ArrayDeque() {
         items = (T[]) new Object[8];
         realSize = 0;
         allSize = 8;
@@ -17,12 +17,12 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         end = 4;
     }
 
-    private void resize(int size){
+    private void resize(int size) {
         int newStart = (size - realSize) / 2;
         T[] newItems = (T[]) new Object[size];
-        System.arraycopy(items, start+1, newItems, newStart, realSize);
+        System.arraycopy(items, start + 1, newItems, newStart, realSize);
         allSize = size;
-        start = newStart-1;
+        start = newStart - 1;
         end = newStart + realSize;
         items = newItems;
     }
@@ -30,7 +30,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     @Override
     public void addFirst(T t) {
-        if (start == 0){
+        if (start == 0) {
             resize((int) (allSize * 1.6));
         }
         items[start] = t;
@@ -40,7 +40,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     @Override
     public void addLast(T t) {
-        if (end == allSize-1){
+        if (end == allSize - 1) {
             resize((int) (allSize * 1.6));
         }
         items[end] = t;
@@ -55,7 +55,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     @Override
     public void printDeque() {
-        for(int i = start + 1 ; i < end ; i++){
+        for(int i = start + 1 ; i < end ; i++) {
             System.out.print(items[i] + " ");
         }
         System.out.println("");
@@ -63,8 +63,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     @Override
     public T removeFirst() {
-        if (realSize == 0)
+        if (realSize == 0) {
             return null;
+        }
         start += 1;
         T result = items[start];
         realSize -= 1;
@@ -75,8 +76,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     @Override
     public T removeLast() {
-        if (realSize == 0)
+        if (realSize == 0) {
             return null;
+        }
         end -= 1;
         T result = items[end];
         realSize -= 1;
@@ -87,8 +89,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     @Override
     public T get(int index) {
-        if (index >= realSize)
+        if (index >= realSize) {
             return null;
+        }
         return items[start + 1 + index];
     }
 
@@ -117,19 +120,19 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     }
 
     @Override
-    public boolean equals(Object o){
-        if ((!(o instanceof ArrayDeque)) || (size() != ((ArrayDeque<?>) o).size())) {
+    public boolean equals(Object o) {
+        if ((!(o instanceof Deque)) || (size() != ((Deque<?>) o).size())) {
             return false;
         }
         T nodeThis = get(0);
-        T nodeO = ((ArrayDeque<T>) o).get(0);
+        T nodeO = ((Deque<T>) o).get(0);
 
         for(int i=1;i<size();i++){
             if (!(nodeThis.equals(nodeO))) {
                 return false;
             }
             nodeThis = get(i);
-            nodeO = ((ArrayDeque<T>) o).get(i);
+            nodeO = ((Deque<T>) o).get(i);
         }
         return true;
     }
