@@ -27,6 +27,7 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
         size = 0;
     }
 
+    @Override
     public void addFirst(Item item){
         Node first = new Node(item, head, head.n);
         head.n = first;
@@ -34,6 +35,7 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
         size += 1;
     }
 
+    @Override
     public void addLast(Item item){
         Node first = new Node(item, tail.p, tail);
         tail.p = first;
@@ -41,14 +43,12 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
         size += 1;
     }
 
-    public boolean isEmpty(){
-        return size == 0;
-    }
-
+    @Override
     public int size(){
         return size;
     }
 
+    @Override
     public void printDeque(){
         Node first = head.n;
         while (first != tail){
@@ -58,6 +58,7 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
         System.out.println("");
     }
 
+    @Override
     public Item removeFirst(){
         if (size == 0)
             return null;
@@ -68,6 +69,7 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
         return (Item) result.value;
     }
 
+    @Override
     public Item removeLast(){
         if (size == 0)
             return null;
@@ -78,6 +80,7 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
         return (Item) result.value;
     }
 
+    @Override
     public Item get(int index){
         if (index >= size)
             return null;

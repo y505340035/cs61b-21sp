@@ -49,11 +49,6 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     }
 
     @Override
-    public boolean isEmpty() {
-        return realSize == 0;
-    }
-
-    @Override
     public int size() {
         return realSize;
     }
