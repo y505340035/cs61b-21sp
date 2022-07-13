@@ -3,11 +3,11 @@ package deque;
 import java.util.Iterator;
 
 public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
-    T[] items;
-    int realSize;
-    int allSize;
-    int start;
-    int end;
+    private T[] items;
+    private int realSize;
+    private int allSize;
+    private int start;
+    private int end;
 
     public ArrayDeque(){
         items = (T[]) new Object[8];
@@ -55,7 +55,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
 
     @Override
     public void printDeque() {
-        for(int i=start+1;i<end;i++){
+        for(int i = start + 1 ; i < end ; i++){
             System.out.print(items[i] + " ");
         }
         System.out.println("");
@@ -69,7 +69,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         T result = items[start];
         realSize -= 1;
         if ((allSize > 100) && (allSize / realSize >= 4))
-            resize(allSize / ((allSize / realSize)/2));
+            resize(allSize / ((allSize / realSize) / 2));
         return result;
     }
 
@@ -81,7 +81,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         T result = items[end];
         realSize -= 1;
         if ((allSize > 100) && (allSize / realSize >= 4))
-            resize(allSize / ((allSize / realSize)/2));
+            resize(allSize / ((allSize / realSize) / 2));
         return result;
     }
 
@@ -89,7 +89,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     public T get(int index) {
         if (index >= realSize)
             return null;
-        return items[start+1+index];
+        return items[start + 1 + index];
     }
 
     @Override
@@ -114,5 +114,23 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
             count += 1;
             return items[start + 1 + count];
         }
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if ((!(o instanceof ArrayDeque)) || (size() != ((ArrayDeque<?>) o).size())) {
+            return false;
+        }
+        T nodeThis = get(0);
+        T nodeO = ((ArrayDeque<T>) o).get(0);
+
+        for(int i=1;i<size();i++){
+            if (!(nodeThis.equals(nodeO))) {
+                return false;
+            }
+            nodeThis = get(i);
+            nodeO = ((ArrayDeque<T>) o).get(i);
+        }
+        return true;
     }
 }

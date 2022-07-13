@@ -2,22 +2,22 @@ package deque;
 
 import java.util.Iterator;
 
-public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
+public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
-    public class Node<Item> {
-        public Item value;
+    public class Node<T> {
+        public T value;
         public Node n;
         public Node p;
 
-        public Node(Item item, Node pri, Node next){
+        public Node(T item, Node pri, Node next){
             value = item;
             n = next;
             p = pri;
         }
     }
 
-    private Node<Item> head;
-    private Node<Item> tail;
+    private Node<T> head;
+    private Node<T> tail;
     private int size;
 
     public LinkedListDeque() {
@@ -28,16 +28,16 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
     }
 
     @Override
-    public void addFirst(Item item){
-        Node first = new Node(item, head, head.n);
+    public void addFirst(T t){
+        Node first = new Node(t, head, head.n);
         head.n = first;
         first.n.p = first;
         size += 1;
     }
 
     @Override
-    public void addLast(Item item){
-        Node first = new Node(item, tail.p, tail);
+    public void addLast(T t){
+        Node first = new Node(t, tail.p, tail);
         tail.p = first;
         first.p.n = first;
         size += 1;
@@ -51,7 +51,7 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
     @Override
     public void printDeque(){
         Node first = head.n;
-        while (first != tail){
+        while (first != tail) {
             System.out.print(first.value + " ");
             first = first.n;
         }
@@ -59,57 +59,62 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
     }
 
     @Override
-    public Item removeFirst(){
-        if (size == 0)
+    public T removeFirst(){
+        if (size == 0) {
             return null;
+        }
         Node result = head.n;
         head.n = result.n;
         result.n.p = head;
         size -= 1;
-        return (Item) result.value;
+        return (T) result.value;
     }
 
     @Override
-    public Item removeLast(){
-        if (size == 0)
+    public T removeLast(){
+        if (size == 0) {
             return null;
+        }
         Node result = tail.p;
         tail.p = result.p;
         result.p.n = tail;
         size -= 1;
-        return (Item) result.value;
+        return (T) result.value;
     }
 
     @Override
-    public Item get(int index){
-        if (index >= size)
+    public T get(int index){
+        if (index >= size) {
             return null;
+        }
         Node tmp = head.n;
-        for (int i=0;i<index;i++){
+        for (int i=0;i<index;i++) {
             tmp = tmp.n;
         }
-        return (Item) tmp.value;
+        return (T) tmp.value;
     }
 
-    public Item getRecursive(int index){
-        if (index >= size)
+    public T getRecursive(int index){
+        if (index >= size) {
             return null;
+        }
         Node tmp = head.n;
-        return (Item) helpGet(index, tmp).value;
+        return (T) helpGet(index, tmp).value;
     }
 
     private Node helpGet(int i, Node node){
-        if (i == 0)
+        if (i == 0) {
             return node;
+        }
         return helpGet(i-1, node.n);
     }
 
     @Override
-    public Iterator<Item> iterator() {
+    public Iterator<T> iterator() {
         return new LinkedListDequeIterator();
     }
 
-    private class LinkedListDequeIterator implements Iterator<Item>{
+    private class LinkedListDequeIterator implements Iterator<T>{
         private Node node;
         private int count;
 
@@ -124,21 +129,24 @@ public class LinkedListDeque<Item> implements Iterable<Item>, Deque<Item> {
         }
 
         @Override
-        public Item next() {
+        public T next() {
             count += 1;
             node = node.n;
-            return (Item) node.value;
+            return (T) node.value;
         }
     }
 
+    @Override
     public boolean equals(Object o){
-        if (!(o instanceof LinkedListDeque))
+        if (!(o instanceof LinkedListDeque)) {
             return false;
+        }
         Node nodeThis = head.n;
-        Node nodeO = ((LinkedListDeque<Item>) o).head.n;
-        while ((nodeThis != tail) && (nodeO != ((LinkedListDeque<Item>) o).tail)){
-            if (!(nodeThis.value.equals(nodeO.value)))
+        Node nodeO = ((LinkedListDeque<T>) o).head.n;
+        while ((nodeThis != tail) && (nodeO != ((LinkedListDeque<T>) o).tail)){
+            if (!(nodeThis.value.equals(nodeO.value))) {
                 return false;
+            }
             nodeThis = nodeThis.n;
             nodeO = nodeO.n;
         }
