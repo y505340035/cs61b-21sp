@@ -182,7 +182,7 @@ public class ArrayDequeTest {
         LinkedListDeque<Integer> L = new LinkedListDeque<>();
         ArrayDeque<Integer> B = new ArrayDeque<>();
 
-        int N = 50000;
+        int N = 5000000;
         for (int i = 0; i < N; i += 1) {
             int operationNumber = StdRandom.uniform(0, 3);
             if (operationNumber == 0) {

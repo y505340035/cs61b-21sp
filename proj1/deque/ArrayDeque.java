@@ -106,7 +106,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         private int count;
 
         public ArrayDequeIterator(){
-            int count = -1;
+            count = -1;
         }
 
         @Override
