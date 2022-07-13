@@ -69,7 +69,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         start += 1;
         T result = items[start];
         realSize -= 1;
-        if ((allSize > 100) && (allSize / (realSize + 1) >= 4)) {
+        if ((allSize > 8) && (allSize / (realSize + 1) >= 4)) {
             resize(allSize / ((allSize / (realSize + 1)) / 2));
         }
         return result;
@@ -83,7 +83,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         end -= 1;
         T result = items[end];
         realSize -= 1;
-        if ((allSize > 100) && (allSize / (realSize + 1) >= 4)) {
+        if ((allSize > 8) && (allSize / (realSize + 1) >= 4)) {
             resize(allSize / ((allSize / (realSize + 1)) / 2));
         }
         return result;
@@ -91,7 +91,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     @Override
     public T get(int index) {
-        if (index >= realSize) {
+        if (index >= realSize || index < 0) {
             return null;
         }
         return items[start + 1 + index];
@@ -102,16 +102,16 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         return new ArrayDequeIterator();
     }
 
-    private class ArrayDequeIterator implements Iterator<T>{
+    private class ArrayDequeIterator implements Iterator<T> {
         private int count;
 
-        public ArrayDequeIterator(){
+        public ArrayDequeIterator() {
             count = -1;
         }
 
         @Override
         public boolean hasNext() {
-            return count+1 < realSize;
+            return count + 1 < realSize;
         }
 
         @Override
@@ -129,7 +129,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         T nodeThis = get(0);
         T nodeO = ((Deque<T>) o).get(0);
 
-        for(int i=1;i<size();i++){
+        for(int i = 1; i < size(); i++) {
             if (!(nodeThis.equals(nodeO))) {
                 return false;
             }

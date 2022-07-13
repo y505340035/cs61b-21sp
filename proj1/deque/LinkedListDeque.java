@@ -4,15 +4,20 @@ import java.util.Iterator;
 
 public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
-    public class Node<T> {
-        public T value;
-        public Node n;
-        public Node p;
+    private class Node<T> {
+        private T value;
+        private Node n;
+        private Node p;
 
         public Node(T item, Node pri, Node next) {
             value = item;
             n = next;
             p = pri;
+        }
+
+        public void init(Node t) {
+            this.n = t;
+            t.p = this;
         }
     }
 
@@ -22,8 +27,8 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
     public LinkedListDeque() {
         head = new Node(null, null, null);
-        tail = new Node(null, head, null);
-        head.n = tail;
+        tail = new Node(null, null, null);
+        head.init(tail);
         size = 0;
     }
 
@@ -44,7 +49,7 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
     }
 
     @Override
-    public int size(){
+    public int size() {
         return size;
     }
 
@@ -84,7 +89,7 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
     @Override
     public T get(int index) {
-        if (index >= size) {
+        if (index >= size || index < 0) {
             return null;
         }
         Node tmp = head.n;
@@ -106,7 +111,7 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
         if (i == 0) {
             return node;
         }
-        return helpGet(i-1, node.n);
+        return helpGet(i - 1, node.n);
     }
 
     @Override
@@ -118,7 +123,7 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
         private Node node;
         private int count;
 
-        public LinkedListDequeIterator() {
+        LinkedListDequeIterator() {
             count = 0;
             node = head;
         }
@@ -145,7 +150,7 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
         T nodeO = ((Deque<T>) o).get(0);
 
 
-        for (int i = 1; i < size(); i++){
+        for (int i = 1; i < size(); i++) {
             if (!(nodeThis.equals(nodeO))) {
                 return false;
             }
