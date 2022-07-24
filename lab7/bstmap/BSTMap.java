@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
+
     private class BSTNode<K extends Comparable<K>, V> {
         K key;
         V val;
@@ -94,11 +95,6 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     }
 
     @Override
-    public Set keySet() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public V remove(K key) {
         throw new UnsupportedOperationException();
     }
@@ -109,7 +105,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     }
 
     @Override
-    public Iterator iterator() {
+    public Set<K> keySet() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Iterator<K> iterator() {
         throw new UnsupportedOperationException();
     }
 
