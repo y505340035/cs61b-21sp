@@ -3,8 +3,8 @@ package bstmap;
 import java.util.Iterator;
 import java.util.Set;
 
-public class BSTMap<K extends Comparable, V> implements Map61B {
-    private class BSTNode<K extends Comparable, V> {
+public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
+    private class BSTNode<K extends Comparable<K>, V> {
         K key;
         V val;
         BSTNode<K, V> left;
@@ -33,11 +33,11 @@ public class BSTMap<K extends Comparable, V> implements Map61B {
     }
 
     @Override
-    public boolean containsKey(Object key) {
+    public boolean containsKey(K key) {
         return helpContains(root, key);
     }
 
-    private boolean helpContains(BSTNode n, Object key) {
+    private boolean helpContains(BSTNode n, K key) {
         if (n == null) {
             return false;
         }
@@ -51,20 +51,20 @@ public class BSTMap<K extends Comparable, V> implements Map61B {
     }
 
     @Override
-    public Object get(Object key) {
+    public V get(K key) {
         return helpGet(root, key);
     }
 
-    private Object helpGet(BSTNode n, Object key) {
+    private V helpGet(BSTNode n, K key) {
         if (n == null) {
             return null;
         }
         if (n.key.equals(key)) {
-            return n.val;
+            return (V) n.val;
         } else if (n.key.compareTo(key) > 0) {
-            return helpGet(n.right, key);
+            return (V) helpGet(n.right, key);
         } else {
-            return helpGet(n.left, key);
+            return (V) helpGet(n.left, key);
         }
     }
 
@@ -74,7 +74,7 @@ public class BSTMap<K extends Comparable, V> implements Map61B {
     }
 
     @Override
-    public void put(Object key, Object value) {
+    public void put(K key, V value) {
         root = helpPut(root, key, value);
     }
 
@@ -99,12 +99,12 @@ public class BSTMap<K extends Comparable, V> implements Map61B {
     }
 
     @Override
-    public Object remove(Object key) {
+    public V remove(K key) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Object remove(Object key, Object value) {
+    public V remove(K key, V value) {
         throw new UnsupportedOperationException();
     }
 
