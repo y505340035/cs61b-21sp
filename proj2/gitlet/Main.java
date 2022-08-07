@@ -136,6 +136,13 @@ public class Main {
                         }
                         repo.checkout(args[2]);
                         break;
+                    // java gitlet.Main checkout [commit id] -- [file name]
+                    case 4:
+                        if (!args[2].equals("--")) {
+                            return;
+                        }
+                        repo.checkout(args[1], args[3]);
+                        break;
                 }
                 break;
             default:
