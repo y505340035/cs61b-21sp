@@ -54,6 +54,10 @@ public class Main {
                     return;
                 }
                 if (args.length < 2) {
+                    System.out.println("Incorrect operands.");
+                    return;
+                }
+                if (args[1].equals("")) {
                     System.out.println("Please enter a commit message.");
                     return;
                 }
