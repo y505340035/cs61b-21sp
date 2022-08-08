@@ -149,15 +149,15 @@ public class Repository implements Serializable {
             addedBolbs.remove(rmFile);
             Integer rmCount = everyBlobCount.get(rmSha1);
             //delete useless blob
-            if (--rmCount <= 0) {
-                everyBlobCount.remove(rmSha1);
-                File deleteFile = join(BOLBS_DIR, rmSha1);
-                if (deleteFile.exists()){
-                    deleteFile.delete();
-                }
-            } else {
-                everyBlobCount.put(rmSha1, rmCount);
-            }
+//            if (--rmCount <= 0) {
+//                everyBlobCount.remove(rmSha1);
+//                File deleteFile = join(BOLBS_DIR, rmSha1);
+//                if (deleteFile.exists()){
+//                    deleteFile.delete();
+//                }
+//            } else {
+//                everyBlobCount.put(rmSha1, rmCount);
+//            }
         }
 
 
@@ -386,11 +386,11 @@ public class Repository implements Serializable {
                     continue;
                 }
             }
-            if (bolbFile.isFile()) {
-                System.out.println("file!!!!!!!!!!!!!!!");
-            } else {
-                System.out.println("nooooooooooooooooooooooooooo");
-            }
+//            if (bolbFile.isFile()) {
+//                System.out.println("file!!!!!!!!!!!!!!!");
+//            } else {
+//                System.out.println("nooooooooooooooooooooooooooo");
+//            }
             writeContents(CWDFile, readContents(bolbFile));
         }
         checkoutBranchCleanStage();
