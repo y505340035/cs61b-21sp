@@ -119,6 +119,11 @@ public class Repository implements Serializable {
     }
 
     public void commit(String message) {
+        if (stage.size() == 0 && stageRM.size() == 0) {
+            System.out.println("No changes added to the commit.");
+            return;
+        }
+
         HashMap<String, String> addedBolbs = new HashMap<>();
         // add
 //        addedBolbs.putAll(lastCommit.bolbs);
@@ -166,6 +171,10 @@ public class Repository implements Serializable {
     }
 
     public boolean rm(String fileName) {
+        File rmFile = join(CWD, fileName);
+        if (rmFile.exists()) {
+            rmFile.delete();
+        }
         if (stage.containsKey(fileName)) {
             String rmSha1 = stage.get(fileName);
             join(BOLBS_DIR, rmSha1).delete();
