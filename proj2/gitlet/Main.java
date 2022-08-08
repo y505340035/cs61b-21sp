@@ -128,15 +128,16 @@ public class Main {
 
                 repo = Utils.readObject(Repository.CURRENT_REPOSITORY, Repository.class);
                 switch (args.length) {
-//                    case 1:
-//                        System.out.println("Incorrect operands.");
-//                        break;
+                    case 1:
+                        System.out.println("Incorrect operands.");
+                        break;
                     case 2:
                         repo.checkoutBranch(args[1]);
                         break;
                     // java gitlet.Main checkout -- [file name]
                     case 3:
                         if (!args[1].equals("--")) {
+                            System.out.println("Incorrect operands.");
                             return;
                         }
                         repo.checkout(args[2]);
@@ -144,6 +145,7 @@ public class Main {
                     // java gitlet.Main checkout [commit id] -- [file name]
                     case 4:
                         if (!args[2].equals("--")) {
+                            System.out.println("Incorrect operands.");
                             return;
                         }
                         repo.checkout(args[1], args[3]);
