@@ -380,10 +380,14 @@ public class Repository implements Serializable {
             File CWDFile = join(CWD, entry.getKey());
             File bolbFile = join(BOLBS_DIR, entry.getValue());
             if (CWDFile.exists() && CWDFile.isFile()) {
+//                System.out.println(CWDFile);
                 String CWDSha1 = sha1(readContents(CWDFile));
                 if (CWDSha1.equals(entry.getValue())) {
                     continue;
                 }
+            }
+            if (bolbFile.isFile()) {
+                System.out.println("file!!!!!!!!!!!!!!!");
             }
             writeContents(CWDFile, readContents(bolbFile));
         }
@@ -448,8 +452,8 @@ public class Repository implements Serializable {
             }
         }
 
+        helpReset(commit);
         HEAD = commit;
-        helpReset(HEAD);
         branches.put(currentBranch, HEAD);
     }
 
