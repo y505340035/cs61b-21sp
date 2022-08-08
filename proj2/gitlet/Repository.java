@@ -38,7 +38,6 @@ public class Repository implements Serializable {
     private Commit HEAD;
     private String currentBranch;
     private HashMap<String, Commit> branches;
-    private HashMap<String, Integer> everyBlobCount;
     private HashMap<String, String> stage;
     private Set<String> stageRM;
 
@@ -60,8 +59,6 @@ public class Repository implements Serializable {
         branches = new HashMap<>();
         currentBranch = "master";
         branches.put(currentBranch, HEAD);
-        // when a blob's count == 0, delete it
-        everyBlobCount = new HashMap<>();
         stage = new HashMap<>();
         stageRM = new HashSet<>();
     }
@@ -89,7 +86,6 @@ public class Repository implements Serializable {
 
         writeContents(join(BOLBS_DIR, sha1), content);
         stage.put(fileName, sha1);
-        everyBlobCount.put(sha1, 1);
     }
 
     public void addReverse(String fileName) {
@@ -130,34 +126,18 @@ public class Repository implements Serializable {
 //        addedBolbs.putAll(lastCommit.bolbs);
         for (Map.Entry<String, String> entry: HEAD.bolbs.entrySet()) {
             addedBolbs.put(entry.getKey(), entry.getValue());
-            Integer count = everyBlobCount.get(entry.getValue());
-            everyBlobCount.put(entry.getValue(), count++);
         }
 //        addedBolbs.putAll(stage);
         for (Map.Entry<String, String> entry: stage.entrySet()) {
             if (addedBolbs.containsKey(entry.getKey())) {
                 String overwriteSha1 = HEAD.bolbs.get(entry.getKey());
-                Integer count = everyBlobCount.get(overwriteSha1);
-                everyBlobCount.put(overwriteSha1, count--);
             }
             addedBolbs.put(entry.getKey(), entry.getValue());
-            everyBlobCount.put(entry.getValue(), 1);
         }
         // rm
         for (String rmFile: stageRM) {
             String rmSha1 = addedBolbs.get(rmFile);
             addedBolbs.remove(rmFile);
-            Integer rmCount = everyBlobCount.get(rmSha1);
-            //delete useless blob
-//            if (--rmCount <= 0) {
-//                everyBlobCount.remove(rmSha1);
-//                File deleteFile = join(BOLBS_DIR, rmSha1);
-//                if (deleteFile.exists()){
-//                    deleteFile.delete();
-//                }
-//            } else {
-//                everyBlobCount.put(rmSha1, rmCount);
-//            }
         }
 
 
@@ -175,7 +155,6 @@ public class Repository implements Serializable {
         if (stage.containsKey(fileName)) {
             String rmSha1 = stage.get(fileName);
             join(BOLBS_DIR, rmSha1).delete();
-            everyBlobCount.remove(rmSha1);
             stage.remove(fileName);
             return true;
         }
@@ -238,8 +217,6 @@ public class Repository implements Serializable {
     }
 
     public void status() {
-        // TODO delete it!
-//        System.out.println(everyBlobCount.toString());
         System.out.println("=== Branches ===");
         System.out.println("*" + currentBranch);
         Set<String> sortBranchesSet = new TreeSet<>(Comparator.reverseOrder());
@@ -379,18 +356,13 @@ public class Repository implements Serializable {
         for (Map.Entry<String, String> entry: commit.bolbs.entrySet()) {
             File CWDFile = join(CWD, entry.getKey());
             File bolbFile = join(BOLBS_DIR, entry.getValue());
-            if (CWDFile.exists() && CWDFile.isFile()) {
+            if (CWDFile.exists()) {
 //                System.out.println(CWDFile);
                 String CWDSha1 = sha1(readContents(CWDFile));
                 if (CWDSha1.equals(entry.getValue())) {
                     continue;
                 }
             }
-//            if (bolbFile.isFile()) {
-//                System.out.println("file!!!!!!!!!!!!!!!");
-//            } else {
-//                System.out.println("nooooooooooooooooooooooooooo");
-//            }
             writeContents(CWDFile, readContents(bolbFile));
         }
         checkoutBranchCleanStage();
@@ -398,7 +370,6 @@ public class Repository implements Serializable {
 
     private void checkoutBranchCleanStage() {
         for (Map.Entry<String, String> entry: stage.entrySet()) {
-            everyBlobCount.remove(entry.getValue());
             File deleteFile = join(BOLBS_DIR, entry.getValue());
             deleteFile.delete();
         }
