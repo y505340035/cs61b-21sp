@@ -77,6 +77,7 @@ public class Repository implements Serializable {
     public void add(String fileName) {
         byte[] content = readContents(join(CWD, fileName));
         String sha1 = sha1(content);
+        stageRM.remove(fileName);
         if (HEAD.bolbs.containsKey(fileName) && (HEAD.bolbs.get(fileName).equals(sha1))) {
             if (stage.containsKey(fileName)) {
                 String existSha1 = stage.get(fileName);
@@ -378,7 +379,7 @@ public class Repository implements Serializable {
         for (Map.Entry<String, String> entry: commit.bolbs.entrySet()) {
             File CWDFile = join(CWD, entry.getKey());
             File bolbFile = join(BOLBS_DIR, entry.getValue());
-            if (CWDFile.exists()) {
+            if (CWDFile.exists() && CWDFile.isFile()) {
                 String CWDSha1 = sha1(readContents(CWDFile));
                 if (CWDSha1.equals(entry.getValue())) {
                     continue;
