@@ -84,7 +84,7 @@ public class Repository implements Serializable {
             return;
         }
 
-        writeContents(join(BOLBS_DIR, sha1), content);
+        writeContents(join(STAGING_AREA_DIR, sha1), content);
         stage.put(fileName, sha1);
     }
 
@@ -129,14 +129,15 @@ public class Repository implements Serializable {
         }
 //        addedBolbs.putAll(stage);
         for (Map.Entry<String, String> entry: stage.entrySet()) {
-            if (addedBolbs.containsKey(entry.getKey())) {
-                String overwriteSha1 = HEAD.bolbs.get(entry.getKey());
-            }
+//            if (addedBolbs.containsKey(entry.getKey())) {
+//                String overwriteSha1 = HEAD.bolbs.get(entry.getKey());
+//            }
             addedBolbs.put(entry.getKey(), entry.getValue());
+            writeContents(join(BOLBS_DIR, entry.getValue()),
+                    readContents(join(STAGING_AREA_DIR, entry.getValue())));
         }
         // rm
         for (String rmFile: stageRM) {
-            String rmSha1 = addedBolbs.get(rmFile);
             addedBolbs.remove(rmFile);
         }
 
@@ -147,14 +148,15 @@ public class Repository implements Serializable {
                                         Utils.sha1(Utils.serialize(HEAD)));
         HEAD = newCommit;
         branches.put(currentBranch, newCommit);
-        stage = new HashMap<>();
-        stageRM = new HashSet<>();
+        checkoutBranchCleanStage();
+//        stage = new HashMap<>();
+//        stageRM = new HashSet<>();
     }
 
     public boolean rm(String fileName) {
         if (stage.containsKey(fileName)) {
             String rmSha1 = stage.get(fileName);
-            join(BOLBS_DIR, rmSha1).delete();
+            join(STAGING_AREA_DIR, rmSha1).delete();
             stage.remove(fileName);
             return true;
         }
@@ -373,6 +375,10 @@ public class Repository implements Serializable {
 //            File deleteFile = join(BOLBS_DIR, entry.getValue());
 //            deleteFile.delete();
 //        }
+        for (Map.Entry<String, String> entry: stage.entrySet()) {
+            File deleteFile = join(STAGING_AREA_DIR, entry.getValue());
+            deleteFile.delete();
+        }
         stage = new HashMap<>();
         stageRM = new HashSet<>();
     }
