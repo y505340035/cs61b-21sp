@@ -171,10 +171,6 @@ public class Repository implements Serializable {
     }
 
     public boolean rm(String fileName) {
-        File rmFile = join(CWD, fileName);
-        if (rmFile.exists()) {
-            rmFile.delete();
-        }
         if (stage.containsKey(fileName)) {
             String rmSha1 = stage.get(fileName);
             join(BOLBS_DIR, rmSha1).delete();
@@ -185,6 +181,10 @@ public class Repository implements Serializable {
 
         if (HEAD.bolbs.containsKey(fileName)) {
             stageRM.add(fileName);
+            File rmFile = join(CWD, fileName);
+            if (rmFile.exists()) {
+                rmFile.delete();
+            }
             return true;
         }
 
