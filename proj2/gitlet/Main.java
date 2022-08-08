@@ -3,7 +3,7 @@ package gitlet;
 import java.io.File;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
- *  @author TODO
+ *  @author Yyy
  */
 public class Main {
 
@@ -18,7 +18,7 @@ public class Main {
         }
 
         String firstArg = args[0];
-        Repository repo = null;
+        Repository repo;
         switch(firstArg) {
             case "init":
                 if (Repository.GITLET_DIR.exists()) {
@@ -128,6 +128,7 @@ public class Main {
 //                        System.out.println("Incorrect operands.");
 //                        break;
                     case 2:
+                        repo.checkoutBranch(args[1]);
                         break;
                     // java gitlet.Main checkout -- [file name]
                     case 3:
@@ -144,6 +145,47 @@ public class Main {
                         repo.checkout(args[1], args[3]);
                         break;
                 }
+                break;
+            case "branch":
+                if (!Repository.GITLET_DIR.exists()) {
+                    System.out.println("Not in an initialized Gitlet directory.");
+                    return;
+                }
+                if (args.length < 2) {
+                    System.out.println("Incorrect operands.");
+                    return;
+                }
+
+                repo = Utils.readObject(Repository.CURRENT_REPOSITORY, Repository.class);
+                if (!repo.newBranch(args[1])) {
+                    System.out.println("A branch with that name already exists.");
+                }
+                break;
+            case "rm-branch":
+                if (!Repository.GITLET_DIR.exists()) {
+                    System.out.println("Not in an initialized Gitlet directory.");
+                    return;
+                }
+                if (args.length < 2) {
+                    System.out.println("Incorrect operands.");
+                    return;
+                }
+
+                repo = Utils.readObject(Repository.CURRENT_REPOSITORY, Repository.class);
+                repo.rmBranch(args[1]);
+                break;
+            case "reset":
+                if (!Repository.GITLET_DIR.exists()) {
+                    System.out.println("Not in an initialized Gitlet directory.");
+                    return;
+                }
+                if (args.length < 2) {
+                    System.out.println("Incorrect operands.");
+                    return;
+                }
+
+                repo = Utils.readObject(Repository.CURRENT_REPOSITORY, Repository.class);
+                repo.reset(args[1]);
                 break;
             default:
                 System.out.println("No command with that name exists.");
