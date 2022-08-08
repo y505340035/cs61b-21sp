@@ -369,10 +369,10 @@ public class Repository implements Serializable {
     }
 
     private void checkoutBranchCleanStage() {
-        for (Map.Entry<String, String> entry: stage.entrySet()) {
-            File deleteFile = join(BOLBS_DIR, entry.getValue());
-            deleteFile.delete();
-        }
+//        for (Map.Entry<String, String> entry: stage.entrySet()) {
+//            File deleteFile = join(BOLBS_DIR, entry.getValue());
+//            deleteFile.delete();
+//        }
         stage = new HashMap<>();
         stageRM = new HashSet<>();
     }
