@@ -388,6 +388,8 @@ public class Repository implements Serializable {
             }
             if (bolbFile.isFile()) {
                 System.out.println("file!!!!!!!!!!!!!!!");
+            } else {
+                System.out.println("nooooooooooooooooooooooooooo");
             }
             writeContents(CWDFile, readContents(bolbFile));
         }
