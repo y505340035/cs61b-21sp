@@ -229,7 +229,7 @@ public class Repository implements Serializable {
 
     public void status() {
         // TODO delete it!
-        System.out.println(everyBlobCount.toString());
+//        System.out.println(everyBlobCount.toString());
         System.out.println("=== Branches ===");
         System.out.println("*" + currentBranch);
         Set<String> sortBranchesSet = new TreeSet<>(Comparator.reverseOrder());
