@@ -117,10 +117,10 @@ public class Repository implements Serializable {
         stage.put(sha1, fileName);
     }
 
-    public void commit(String message) {
+    public boolean commit(String message) {
         if (stage.size() == 0 && stageRM.size() == 0) {
             System.out.println("No changes added to the commit.");
-            return;
+            return false;
         }
 
         HashMap<String, String> addedBolbs = new HashMap<>();
@@ -153,8 +153,8 @@ public class Repository implements Serializable {
         HEAD = newCommit;
         branches.put(currentBranch, newCommit);
         checkoutBranchCleanStage();
-//        stage = new HashMap<>();
-//        stageRM = new HashSet<>();
+
+        return true;
     }
 
     public boolean rm(String fileName) {

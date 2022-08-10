@@ -193,6 +193,19 @@ public class Main {
                 repo = Utils.readObject(Repository.CURRENT_REPOSITORY, Repository.class);
                 repo.reset(args[1]);
                 break;
+            case "merge":
+                if (!Repository.GITLET_DIR.exists()) {
+                    System.out.println("Not in an initialized Gitlet directory.");
+                    return;
+                }
+                if (args.length < 2) {
+                    System.out.println("Incorrect operands.");
+                    return;
+                }
+
+                repo = Utils.readObject(Repository.CURRENT_REPOSITORY, Repository.class);
+                repo.merge(args[1]);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 return;
