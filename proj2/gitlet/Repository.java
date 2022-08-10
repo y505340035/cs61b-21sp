@@ -1,7 +1,9 @@
 package gitlet;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -133,8 +135,10 @@ public class Repository implements Serializable {
 //                String overwriteSha1 = HEAD.bolbs.get(entry.getKey());
 //            }
             addedBolbs.put(entry.getKey(), entry.getValue());
-            writeContents(join(BOLBS_DIR, entry.getValue()),
-                    readContents(join(STAGING_AREA_DIR, entry.getValue())));
+            File stageFile = join(STAGING_AREA_DIR, entry.getValue());
+            if (stageFile.exists()) {
+                writeContents(join(BOLBS_DIR, entry.getValue()), readContents(stageFile));
+            }
         }
         // rm
         for (String rmFile: stageRM) {
@@ -434,6 +438,166 @@ public class Repository implements Serializable {
         helpReset(commit);
         HEAD = commit;
         branches.put(currentBranch, HEAD);
+    }
+
+    public void merge(String branchName) {
+        if (!branches.containsKey(branchName)) {
+            System.out.println("A branch with that name does not exist.");
+            return;
+        }
+
+        if (stage.size() != 0 || stageRM.size() != 0) {
+            System.out.println("You have uncommitted changes.");
+            return;
+        }
+
+        if (branchName.equals(currentBranch)) {
+            System.out.println("Cannot merge a branch with itself.");
+            return;
+        }
+
+
+        Commit branchCommit = branches.get(branchName);
+        Commit currentBranchCommit = branches.get(currentBranch);
+        Commit LCA = findLatestCommonAncestor(currentBranchCommit, branchCommit);
+        if (sha1(serialize(LCA)).equals(sha1(serialize(branchCommit)))) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            return;
+        }
+        if (sha1(serialize(LCA)).equals(sha1(serialize(currentBranchCommit)))) {
+            checkoutBranch(branchName);
+            System.out.println("Current branch fast-forwarded.");
+            return;
+        }
+
+        boolean isConflict = processMerge(currentBranchCommit, branchCommit, LCA);
+        commit("Merged [" + branchName + "] into [" + currentBranch + "].");
+
+        if (isConflict) {
+            System.out.println("Encountered a merge conflict.");
+        }
+
+
+
+    }
+
+    private Commit findLatestCommonAncestor(Commit A, Commit B) {
+        Set<String> AFather = new HashSet<>();
+        while (!A.parentSha1.equals("")) {
+            AFather.add(A.parentSha1);
+        }
+
+        while (!B.parentSha1.equals("")) {
+            if (AFather.contains(B.parentSha1)) {
+                File readFile = join(COMMIT_AREA, B.parentSha1);
+                return readObject(readFile, Commit.class);
+            }
+        }
+
+        return null;
+    }
+
+    private boolean processMerge(Commit currentBranchCommit, Commit givenBranchCommit, Commit ancestorCommit) {
+        HashMap<String, String> branchBlobs = new HashMap<>();
+        branchBlobs.putAll(givenBranchCommit.bolbs);
+        HashMap<String, String> currentBlobs = new HashMap<>();
+        currentBlobs.putAll(currentBranchCommit.bolbs);
+        boolean isConflict = false;
+
+        for(Map.Entry<String, String> entry: ancestorCommit.bolbs.entrySet()) {
+            String fileName = entry.getKey();
+            String bSha1 = branchBlobs.get(fileName);
+            String cSha1 = currentBlobs.get(fileName);
+
+            if (branchBlobs.containsKey(fileName)) {
+                if (entry.getValue().equals(bSha1)) {
+                    if (currentBlobs.containsKey(fileName)) {
+                        if (!entry.getValue().equals(cSha1)) {
+                            if (!currentBlobs.get(fileName).equals(bSha1)) {
+                                conflict(cSha1, bSha1, fileName);
+                                isConflict = true;
+                            }
+                        } else {
+//                            writeContents(join(STAGING_AREA_DIR, bSha1), readContents(join(BOLBS_DIR, bSha1)));
+                            stage.put(fileName, bSha1);
+                        }
+                    } else {
+                        conflict(null, branchBlobs.get(fileName), fileName);
+                        isConflict = true;
+                    }
+                }
+            } else {
+                if (currentBlobs.containsKey(fileName)) {
+                    if (!entry.getValue().equals(cSha1)) {
+                        conflict(cSha1, null, fileName);
+                        isConflict = true;
+                    } else {
+                        rm(fileName);
+                    }
+                }
+            }
+
+            branchBlobs.remove(fileName);
+            currentBlobs.remove(fileName);
+        }
+
+        for (Map.Entry<String, String> entry: branchBlobs.entrySet()) {
+            String fileName = entry.getKey();
+            String bSha1 = entry.getValue();
+            if (currentBlobs.containsKey(fileName)) {
+                if (bSha1.equals(currentBlobs.get(fileName))) {
+                    stage.put(fileName, bSha1);
+                } else {
+                    conflict(null, bSha1, fileName);
+                    isConflict = true;
+                }
+            } else {
+                stage.put(fileName, bSha1);
+            }
+        }
+
+        return isConflict;
+    }
+
+    private void conflict(String currentFileSha1, String givenFileSha1, String fileName) {
+        final String currentFiled = "=======\n";
+        final String givenFiled = ">>>>>>>\n";
+
+        byte[] currentContent;
+        byte[] givenContent;
+
+        if (currentFileSha1 == null) {
+            currentContent = serialize(currentFiled);
+        } else {
+            File currentFile = join(BOLBS_DIR, currentFileSha1);
+            currentContent = concat(readContents(currentFile), serialize(currentFiled));
+        }
+
+        if (givenFileSha1 == null) {
+            givenContent = serialize(givenFiled);
+        } else {
+            File givenFile = join(BOLBS_DIR, givenFileSha1);
+            givenContent = concat(readContents(givenFile), serialize(givenFiled));
+        }
+
+        byte[] content = concat(currentContent, givenContent);
+        String sha1 = sha1(content);
+
+        writeContents(join(STAGING_AREA_DIR, sha1), content);
+        stage.put(fileName, sha1);
+    }
+
+    private byte[] concat(byte[] A, byte[] B) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            baos.write(A);
+            baos.write(B);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        byte[] C = baos.toByteArray();
+
+        return C;
     }
 
 }

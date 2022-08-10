@@ -23,22 +23,12 @@ public class Commit implements Serializable {
      */
 
     /** The message of this Commit. */
-//    class Bolb implements Serializable {
-//        private String name;
-//        private int version;
-//        private File file;
-//
-//        Bolb(String n, int v, File f) {
-//            name = n;
-//            version = v;
-//            file = f;
-//        }
-//    }
 
     public Date timeStamp;
     public String message;
     public HashMap<String, String> bolbs;
     public String parentSha1;
+    private String secParentSha1;
 
     /**
      * make init commit
@@ -48,6 +38,7 @@ public class Commit implements Serializable {
         this.message = "initial commit";
         this.bolbs = new HashMap<>();
         this.parentSha1 = "";
+        this.secParentSha1 = null;
         String sha1 = Utils.sha1(Utils.serialize(this));
         Utils.writeObject(Utils.join(Repository.COMMIT_AREA, sha1), this);
     }
@@ -57,31 +48,14 @@ public class Commit implements Serializable {
         this.message = message;
         this.bolbs = bolbs;
         this.parentSha1 = parentSha1;
+        this.secParentSha1 = null;
         String sha1 = Utils.sha1(Utils.serialize(this));
         Utils.writeObject(Utils.join(Repository.COMMIT_AREA, sha1), this);
     }
     /* TODO: fill in the rest of this class. */
 
-    public void add(String name, File file, Commit lastCommit) {
-//        int version = 1;
-//        if (lastCommit.bolbs.containsKey(name)) {
-//            Bolb oldBolb = lastCommit.bolbs.get(name);
-//            String newSha1 = Utils.sha1(Utils.readContents(file));
-//            String oldSha1 = Utils.sha1(Utils.readContents(oldBolb.file));
-//            if (oldSha1.equals(newSha1)) {
-//                return;
-//            } else {
-//                version = oldBolb.version;
-//            }
-//        }
-//        File newFile = Utils.join(Repository.STAGING_AREA_DIR, name);
-//        // if parent dir do not exist, then create it
-//        File fileParent = newFile.getParentFile();
-//        if(!fileParent.exists()) {
-//            fileParent.mkdirs();
-//        }
-//
-//        Utils.writeContents(newFile, Utils.readContents(file));
-//        bolbs.put(name, new Bolb(name, version, newFile));
+    public void setSecParentSha1(String sha1) {
+        this.secParentSha1 = sha1;
     }
+
 }
