@@ -485,6 +485,7 @@ public class Repository implements Serializable {
         Set<String> AFather = new HashSet<>();
         while (!A.parentSha1.equals("")) {
             AFather.add(A.parentSha1);
+            A = getCommit(A.parentSha1);
         }
 
         while (!B.parentSha1.equals("")) {
@@ -492,6 +493,7 @@ public class Repository implements Serializable {
                 File readFile = join(COMMIT_AREA, B.parentSha1);
                 return readObject(readFile, Commit.class);
             }
+            B = getCommit(B.parentSha1);
         }
 
         return null;
