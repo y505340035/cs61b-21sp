@@ -1,10 +1,7 @@
 package gitlet;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 
 import static gitlet.Utils.*;
@@ -484,13 +481,15 @@ public class Repository implements Serializable {
     private Commit findLatestCommonAncestor(Commit A, Commit B) {
         Set<String> AFather = new HashSet<>();
         while (!A.parentSha1.equals("")) {
-            AFather.add(A.parentSha1);
+            AFather.add(sha1(serialize(A)));
             A = getCommit(A.parentSha1);
         }
+        AFather.add(sha1(serialize(A)));
 
         while (!B.parentSha1.equals("")) {
-            if (AFather.contains(B.parentSha1)) {
-                File readFile = join(COMMIT_AREA, B.parentSha1);
+            String bSha1 = sha1(serialize(B));
+            if (AFather.contains(bSha1)) {
+                File readFile = join(COMMIT_AREA, bSha1);
                 return readObject(readFile, Commit.class);
             }
             B = getCommit(B.parentSha1);
@@ -512,7 +511,7 @@ public class Repository implements Serializable {
             String cSha1 = currentBlobs.get(fileName);
 
             if (branchBlobs.containsKey(fileName)) {
-                if (entry.getValue().equals(bSha1)) {
+                if (!entry.getValue().equals(bSha1)) {
                     if (currentBlobs.containsKey(fileName)) {
                         if (!entry.getValue().equals(cSha1)) {
                             if (!currentBlobs.get(fileName).equals(bSha1)) {
@@ -565,28 +564,59 @@ public class Repository implements Serializable {
         final String currentFiled = "=======\n";
         final String givenFiled = ">>>>>>>\n";
 
-        byte[] currentContent;
-        byte[] givenContent;
+//        byte[] currentContent;
+//        byte[] givenContent;
+//
+//        if (currentFileSha1 == null) {
+//            currentContent = serialize(currentFiled);
+//        } else {
+//            File currentFile = join(BOLBS_DIR, currentFileSha1);
+//            currentContent = concat(readContents(currentFile), serialize(currentFiled));
+//        }
+//
+//        if (givenFileSha1 == null) {
+//            givenContent = serialize(givenFiled);
+//        } else {
+//            File givenFile = join(BOLBS_DIR, givenFileSha1);
+//            givenContent = concat(readContents(givenFile), serialize(givenFiled));
+//        }
+//
+//        byte[] content = concat(currentContent, givenContent);
+//        String sha1 = sha1(content);
+//
+//        writeContents(join(STAGING_AREA_DIR, sha1), content);
+//        stage.put(fileName, sha1);
+//        writeContents(join(CWD, fileName), content);
 
-        if (currentFileSha1 == null) {
-            currentContent = serialize(currentFiled);
-        } else {
-            File currentFile = join(BOLBS_DIR, currentFileSha1);
-            currentContent = concat(readContents(currentFile), serialize(currentFiled));
+        File mergeFile = join(CWD, fileName);
+        RandomAccessFile raf = null;
+
+        try {
+            if (!mergeFile.exists()) {
+                mergeFile.createNewFile();
+            }
+            raf = new RandomAccessFile(mergeFile,"rw");
+            raf.seek(raf.length());
+//            if (currentFileSha1 != null) {
+//                File currentFile = join(BOLBS_DIR, currentFileSha1);
+//                raf.write(readContents(currentFile));
+//            }
+            raf.writeBytes(currentFiled);
+            if (givenFileSha1 != null) {
+                File givenFile = join(BOLBS_DIR, givenFileSha1);
+                raf.write(readContents(givenFile));
+            }
+            raf.writeBytes(givenFiled);
+
+            raf.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        if (givenFileSha1 == null) {
-            givenContent = serialize(givenFiled);
-        } else {
-            File givenFile = join(BOLBS_DIR, givenFileSha1);
-            givenContent = concat(readContents(givenFile), serialize(givenFiled));
-        }
-
-        byte[] content = concat(currentContent, givenContent);
+        byte[] content = readContents(mergeFile);
         String sha1 = sha1(content);
-
         writeContents(join(STAGING_AREA_DIR, sha1), content);
         stage.put(fileName, sha1);
+
     }
 
     private byte[] concat(byte[] A, byte[] B) {
