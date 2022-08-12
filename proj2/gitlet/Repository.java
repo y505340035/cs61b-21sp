@@ -615,7 +615,7 @@ public class Repository implements Serializable {
 //                File currentFile = join(BOLBS_DIR, currentFileSha1);
 //                raf.write(readContents(currentFile));
 //            }
-            raf.writeBytes("\n");
+//            raf.writeBytes("\n");
             raf.writeBytes(currentFiled);
             if (givenFileSha1 != null) {
                 File givenFile = join(BOLBS_DIR, givenFileSha1);
