@@ -24,10 +24,10 @@ public class Commit implements Serializable {
 
     /** The message of this Commit. */
 
-    public Date timeStamp;
-    public String message;
-    public HashMap<String, String> bolbs;
-    public String parentSha1;
+    private Date timeStamp;
+    private String message;
+    private HashMap<String, String> bolbs;
+    private String parentSha1;
     private String secParentSha1;
 
     /**
@@ -58,4 +58,39 @@ public class Commit implements Serializable {
         this.secParentSha1 = sha1;
     }
 
+    public Date getTimeStamp() {
+        return timeStamp;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public HashMap<String, String> getBolbs() {
+        return bolbs;
+    }
+
+    public String getParentSha1() {
+        return parentSha1;
+    }
+
+    public String getSecParentSha1() {
+        return secParentSha1;
+    }
+
+    public void setTimeStamp(Date timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setBolbs(HashMap<String, String> bolbs) {
+        this.bolbs = bolbs;
+    }
+
+    public void setParentSha1(String parentSha1) {
+        this.parentSha1 = parentSha1;
+    }
 }

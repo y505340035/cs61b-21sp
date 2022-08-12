@@ -76,7 +76,7 @@ public class Repository implements Serializable {
         byte[] content = readContents(join(CWD, fileName));
         String sha1 = sha1(content);
         stageRM.remove(fileName);
-        if (HEAD.bolbs.containsKey(fileName) && (HEAD.bolbs.get(fileName).equals(sha1))) {
+        if (HEAD.getBolbs().containsKey(fileName) && (HEAD.getBolbs().get(fileName).equals(sha1))) {
             if (stage.containsKey(fileName)) {
                 String existSha1 = stage.get(fileName);
                 restrictedDelete(join(BOLBS_DIR, existSha1));
@@ -98,7 +98,7 @@ public class Repository implements Serializable {
         HashMap<String, String> addedBolbs = new HashMap<>();
         // add
 //        addedBolbs.putAll(lastCommit.bolbs);
-        for (Map.Entry<String, String> entry: HEAD.bolbs.entrySet()) {
+        for (Map.Entry<String, String> entry: HEAD.getBolbs().entrySet()) {
             addedBolbs.put(entry.getKey(), entry.getValue());
         }
 //        addedBolbs.putAll(stage);
@@ -137,7 +137,7 @@ public class Repository implements Serializable {
             return true;
         }
 
-        if (HEAD.bolbs.containsKey(fileName)) {
+        if (HEAD.getBolbs().containsKey(fileName)) {
             stageRM.add(fileName);
             File rmFile = join(CWD, fileName);
             if (rmFile.exists()) {
@@ -153,10 +153,10 @@ public class Repository implements Serializable {
         Commit iterCommit = HEAD;
         while (true) {
             printLog(iterCommit);
-            if (iterCommit.parentSha1.equals("")) {
+            if (iterCommit.getParentSha1().equals("")) {
                 break;
             }
-            File commitFile = join(COMMIT_AREA, iterCommit.parentSha1);
+            File commitFile = join(COMMIT_AREA, iterCommit.getParentSha1());
             iterCommit = readObject(commitFile, Commit.class);
         }
     }
@@ -174,7 +174,7 @@ public class Repository implements Serializable {
         boolean res = false;
         for (String commitFile: plainFilenamesIn(COMMIT_AREA)) {
             iterCommit = readObject(join(COMMIT_AREA, commitFile), Commit.class);
-            if (msg.equals(iterCommit.message)) {
+            if (msg.equals(iterCommit.getMessage())) {
                 System.out.println(commitFile);
                 res = true;
             }
@@ -187,10 +187,10 @@ public class Repository implements Serializable {
         System.out.println("===");
         System.out.println("commit " + sha1);
         Formatter fmt = new Formatter(Locale.ENGLISH);
-        Date cal = commit.timeStamp;
+        Date cal = commit.getTimeStamp();
         fmt.format("%ta %tb %td %tR:%tS %tY %tz", cal, cal, cal, cal, cal, cal, cal);
         System.out.println("Date: " + fmt);
-        System.out.println(commit.message);
+        System.out.println(commit.getMessage());
         System.out.println();
     }
 
@@ -245,7 +245,7 @@ public class Repository implements Serializable {
     private Set<String> getUntrackedFile() {
         Set<String> sortUntrackedSet = new TreeSet<>(Comparator.reverseOrder());
         for (String CWDFIle: plainFilenamesIn(CWD)) {
-            if (!HEAD.bolbs.containsKey(CWDFIle) && !stage.containsKey(CWDFIle)) {
+            if (!HEAD.getBolbs().containsKey(CWDFIle) && !stage.containsKey(CWDFIle)) {
                 sortUntrackedSet.add(CWDFIle);
             }
         }
@@ -258,7 +258,7 @@ public class Repository implements Serializable {
 
         Set<String> sortSet = new TreeSet<>(Comparator.reverseOrder());
         // 1 & 4
-        for (Map.Entry<String, String> entry: HEAD.bolbs.entrySet()) {
+        for (Map.Entry<String, String> entry: HEAD.getBolbs().entrySet()) {
             // 4
             File workFile =  join(CWD, entry.getKey());
             if (!workFile.exists() && !stageRM.contains(entry.getKey())) {
@@ -322,7 +322,7 @@ public class Repository implements Serializable {
             return false;
         }
         for (String file:plainFilenamesIn(CWD)) {
-            if (!HEAD.bolbs.containsKey(file)) {
+            if (!HEAD.getBolbs().containsKey(file)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return false;
             }
@@ -336,12 +336,12 @@ public class Repository implements Serializable {
 
     private void helpReset(Commit commit) {
         for (String file:plainFilenamesIn(CWD)) {
-            if (!commit.bolbs.containsKey(file)) {
+            if (!commit.getBolbs().containsKey(file)) {
                 File deleteFile = join(CWD, file);
                 deleteFile.delete();
             }
         }
-        for (Map.Entry<String, String> entry: commit.bolbs.entrySet()) {
+        for (Map.Entry<String, String> entry: commit.getBolbs().entrySet()) {
             File CWDFile = join(CWD, entry.getKey());
             File bolbFile = join(BOLBS_DIR, entry.getValue());
             if (CWDFile.exists()) {
@@ -370,13 +370,13 @@ public class Repository implements Serializable {
     }
 
     private boolean helpCheckout(String fileName, Commit commit) {
-        if (!commit.bolbs.containsKey(fileName)) {
+        if (!commit.getBolbs().containsKey(fileName)) {
             System.out.println("File does not exist in that commit.");
             return false;
         }
 
         File checkoutFile = join(CWD, fileName);
-        File blob = join(BOLBS_DIR, commit.bolbs.get(fileName));
+        File blob = join(BOLBS_DIR, commit.getBolbs().get(fileName));
         writeContents(checkoutFile, readContents(blob));
         return true;
     }
@@ -411,7 +411,7 @@ public class Repository implements Serializable {
         }
         Commit commit = getCommit(commitSha1);
         for (String file:plainFilenamesIn(CWD)) {
-            if (!HEAD.bolbs.containsKey(file) && !commit.bolbs.containsValue(sha1(readContents(join(CWD, file))))) {
+            if (!HEAD.getBolbs().containsKey(file) && !commit.getBolbs().containsValue(sha1(readContents(join(CWD, file))))) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
             }
@@ -470,11 +470,20 @@ public class Repository implements Serializable {
 
     private Commit findLatestCommonAncestor(Commit A, Commit B) {
         Set<String> AFather = new HashSet<>();
-        while (!A.parentSha1.equals("")) {
+        while (!A.getParentSha1().equals("")) {
             AFather.add(sha1(serialize(A)));
-            A = getCommit(A.parentSha1);
+            A = getCommit(A.getParentSha1());
         }
         AFather.add(sha1(serialize(A)));
+
+        if (A.getSecParentSha1() != null) {
+            Commit secFather = getCommit(A.getSecParentSha1());
+            while (!secFather.getParentSha1().equals("")) {
+                AFather.add(sha1(serialize(secFather)));
+                secFather = getCommit(secFather.getParentSha1());
+            }
+            AFather.add(sha1(serialize(secFather)));
+        }
 
         while (true) {
             String bSha1 = sha1(serialize(B));
@@ -482,8 +491,8 @@ public class Repository implements Serializable {
                 File readFile = join(COMMIT_AREA, bSha1);
                 return readObject(readFile, Commit.class);
             }
-            if (!B.parentSha1.equals("")) {
-                B = getCommit(B.parentSha1);
+            if (!B.getParentSha1().equals("")) {
+                B = getCommit(B.getParentSha1());
             } else {
                 break;
             }
@@ -494,12 +503,12 @@ public class Repository implements Serializable {
 
     private boolean processMerge(Commit currentBranchCommit, Commit givenBranchCommit, Commit ancestorCommit) {
         HashMap<String, String> branchBlobs = new HashMap<>();
-        branchBlobs.putAll(givenBranchCommit.bolbs);
+        branchBlobs.putAll(givenBranchCommit.getBolbs());
         HashMap<String, String> currentBlobs = new HashMap<>();
-        currentBlobs.putAll(currentBranchCommit.bolbs);
+        currentBlobs.putAll(currentBranchCommit.getBolbs());
         boolean isConflict = false;
 
-        for(Map.Entry<String, String> entry: ancestorCommit.bolbs.entrySet()) {
+        for(Map.Entry<String, String> entry: ancestorCommit.getBolbs().entrySet()) {
             String fileName = entry.getKey();
             String bSha1 = branchBlobs.get(fileName);
             String cSha1 = currentBlobs.get(fileName);
