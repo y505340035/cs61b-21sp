@@ -293,6 +293,13 @@ public class Repository implements Serializable {
     }
 
     public boolean checkout(String commitSha1, String fileName) {
+        if (commitSha1.length() == 5) {
+            commitSha1 = useShortId(commitSha1);
+            if (commitSha1 == null) {
+                return false;
+            }
+        }
+
         File commitFile = join(COMMIT_AREA, commitSha1);
         if (!commitFile.exists()) {
             System.out.println("No commit with that id exists.");
@@ -404,7 +411,9 @@ public class Repository implements Serializable {
         }
         Commit commit = getCommit(commitSha1);
         for (String file:plainFilenamesIn(CWD)) {
-            if (!HEAD.getBolbs().containsKey(file) && !commit.getBolbs().containsValue(sha1(readContents(join(CWD, file))))) {
+            boolean b1 = !HEAD.getBolbs().containsKey(file);
+            boolean b2 = !commit.getBolbs().containsValue(sha1(readContents(join(CWD, file))));
+            if (b1 && b2) {
                 String msgA = "There is an untracked file in the way; delete it, ";
                 String msgB = "or add and commit it first.";
                 String msg = msgA + msgB;
@@ -627,6 +636,21 @@ public class Repository implements Serializable {
         stringBuffer.append("common father: " + fatherCommit.getMessage() + "\n");
         stringBuffer.append("father sha1:" + sha1(serialize(fatherCommit)) + "\n\n\n");
         writeContents(log, stringBuffer.toString());
+    }
+
+    private String useShortId(String id) {
+        String fullSha1 = null;
+        for (String fileName: plainFilenamesIn(COMMIT_AREA)) {
+            String sub = fileName.substring(0, 5);
+            if (id.equals(sub)) {
+                if (fullSha1 == null) {
+                    fullSha1 = fileName;
+                } else {
+                    return null;
+                }
+            }
+        }
+        return  fullSha1;
     }
 
 }
