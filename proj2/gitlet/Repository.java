@@ -6,17 +6,16 @@ import java.util.*;
 
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
 
 /** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
+ *  It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
  *  @author Yyy
  */
 public class Repository implements Serializable {
     /**
-     * TODO: add instance variables here.
+     * add instance variables here.
      *
      * List all instance variables of the Repository class here with a useful
      * comment above them describing what that variable represents and how that
@@ -32,16 +31,13 @@ public class Repository implements Serializable {
     public static final File CURRENT_REPOSITORY = join(GITLET_DIR, "currentRepository");
     public static final File COMMIT_AREA = join(GITLET_DIR, "commitArea");
 
-    public final Commit initCommit;
+    private final Commit initCommit;
 
     private Commit HEAD;
     private String currentBranch;
     private HashMap<String, Commit> branches;
     private HashMap<String, String> stage;
     private Set<String> stageRM;
-
-
-    /* TODO: fill in the rest of this class. */
 
     /**
      * gitlet init the dir
@@ -231,11 +227,6 @@ public class Repository implements Serializable {
 
         System.out.println("=== Untracked Files ===");
         Set<String> sortUntrackedSet = getUntrackedFile();
-//        for (String CWDFIle: plainFilenamesIn(CWD)) {
-//            if (!HEAD.bolbs.containsKey(CWDFIle) && !stage.containsKey(CWDFIle)) {
-//                sortUntrackedSet.add(CWDFIle);
-//            }
-//        }
         for (String file: sortUntrackedSet) {
             System.out.println(file);
         }
@@ -244,9 +235,9 @@ public class Repository implements Serializable {
 
     private Set<String> getUntrackedFile() {
         Set<String> sortUntrackedSet = new TreeSet<>(Comparator.reverseOrder());
-        for (String CWDFIle: plainFilenamesIn(CWD)) {
-            if (!HEAD.getBolbs().containsKey(CWDFIle) && !stage.containsKey(CWDFIle)) {
-                sortUntrackedSet.add(CWDFIle);
+        for (String file: plainFilenamesIn(CWD)) {
+            if (!HEAD.getBolbs().containsKey(file) && !stage.containsKey(file)) {
+                sortUntrackedSet.add(file);
             }
         }
         return sortUntrackedSet;
@@ -342,16 +333,15 @@ public class Repository implements Serializable {
             }
         }
         for (Map.Entry<String, String> entry: commit.getBolbs().entrySet()) {
-            File CWDFile = join(CWD, entry.getKey());
+            File cwdFile = join(CWD, entry.getKey());
             File bolbFile = join(BOLBS_DIR, entry.getValue());
-            if (CWDFile.exists()) {
-//                System.out.println(CWDFile);
-                String CWDSha1 = sha1(readContents(CWDFile));
-                if (CWDSha1.equals(entry.getValue())) {
+            if (cwdFile.exists()) {
+                String cwdSha1 = sha1(readContents(cwdFile));
+                if (cwdSha1.equals(entry.getValue())) {
                     continue;
                 }
             }
-            writeContents(CWDFile, readContents(bolbFile));
+            writeContents(cwdFile, readContents(bolbFile));
         }
         checkoutBranchCleanStage();
     }
@@ -445,55 +435,23 @@ public class Repository implements Serializable {
 
         Commit branchCommit = branches.get(branchName);
         Commit currentBranchCommit = branches.get(currentBranch);
-        Commit LCA = findLatestCommonAncestor(currentBranchCommit, branchCommit);
+        Commit commonFatherCommit = findLatestCommonAncestor(currentBranchCommit, branchCommit);
 
-        File log = join(GITLET_DIR, "log.txt");
-        if (!log.exists()) {
-            try {
-                log.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        String secFM = "null";
-        if (currentBranchCommit.getSecParentSha1() != null) {
-            Commit secFather = getCommit(currentBranchCommit.getSecParentSha1());
-            secFM = secFather.getMessage();
-        }
+        // generate log in the .gitlet/log.txt
+//        generateMyTestLog(currentBranchCommit, branchCommit, commonFatherCommit);
 
-        String givenFathermsg = "null";
-        if (branchCommit.getParentSha1() != null) {
-            Commit givenFather = getCommit(branchCommit.getParentSha1());
-            givenFathermsg = givenFather.getMessage();
-        }
-        StringBuffer stringBuffer = new StringBuffer(readContentsAsString(log));
-        stringBuffer.append("current branch: " + currentBranchCommit.getMessage() + "\n");
-        stringBuffer.append("sec father: " + secFM + "\n");
-        stringBuffer.append("given branch: " + branchCommit.getMessage() + "\n");
-        stringBuffer.append("givenBranch Father: " + givenFathermsg + "\n");
-        stringBuffer.append("common father: " + LCA.getMessage() + "\n");
-        stringBuffer.append("father sha1:" + sha1(serialize(LCA)) + "\n\n\n");
 
-        writeContents(log, stringBuffer.toString());
-
-//        if (LCA == initCommit) {
-//            try {
-//                join(CWD, "EEEEEEEEEEE").createNewFile();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-        if (sha1(serialize(LCA)).equals(sha1(serialize(branchCommit)))) {
+        if (sha1(serialize(commonFatherCommit)).equals(sha1(serialize(branchCommit)))) {
             System.out.println("Given branch is an ancestor of the current branch.");
             return;
         }
-        if (sha1(serialize(LCA)).equals(sha1(serialize(currentBranchCommit)))) {
+        if (sha1(serialize(commonFatherCommit)).equals(sha1(serialize(currentBranchCommit)))) {
             checkoutBranch(branchName);
             System.out.println("Current branch fast-forwarded.");
             return;
         }
 
-        boolean isConflict = processMerge(currentBranchCommit, branchCommit, LCA);
+        boolean isConflict = processMerge(currentBranchCommit, branchCommit, commonFatherCommit);
         commit("Merged " + branchName + " into " + currentBranch + ".");
         HEAD.setSecParentSha1(sha1(serialize(branchCommit)));
 
@@ -508,21 +466,9 @@ public class Repository implements Serializable {
 
     private Commit findLatestCommonAncestor(Commit A, Commit B) {
         Set<String> AFather = new HashSet<>();
+
+        // process second father
         if (A.getSecParentSha1() != null) {
-
-            File log = join(GITLET_DIR, "log.txt");
-            if (!log.exists()) {
-                try {
-                    log.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            StringBuffer stringBuffer = new StringBuffer(readContentsAsString(log));
-            stringBuffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-            writeContents(log, stringBuffer.toString());
-
-
             Commit secFather = getCommit(A.getSecParentSha1());
             AFather.add(sha1(serialize(secFather)));
             while (!secFather.getParentSha1().equals("")) {
@@ -531,6 +477,7 @@ public class Repository implements Serializable {
             }
         }
 
+        // process first father
         while (!A.getParentSha1().equals("")) {
             AFather.add(sha1(serialize(A)));
             A = getCommit(A.getParentSha1());
@@ -641,36 +588,36 @@ public class Repository implements Serializable {
         writeContents(join(STAGING_AREA_DIR, sha11), contents);
         writeContents(mergeFile, contents);
         stage.put(fileName, sha11);
-        return;
+    }
 
+    private void generateMyTestLog(Commit currentCommit, Commit branchCommit, Commit commonFatherCommit) {
+        File log = join(GITLET_DIR, "log.txt");
+        if (!log.exists()) {
+            try {
+                log.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        String secFM = "null";
+        if (currentCommit.getSecParentSha1() != null) {
+            Commit secFather = getCommit(currentCommit.getSecParentSha1());
+            secFM = secFather.getMessage();
+        }
 
-//        try {
-//            if (!mergeFile.exists()) {
-//                mergeFile.createNewFile();
-//            }
-//            raf = new RandomAccessFile(mergeFile,"rw");
-//            raf.seek(raf.length());
-////            if (currentFileSha1 != null) {
-////                File currentFile = join(BOLBS_DIR, currentFileSha1);
-////                raf.write(readContents(currentFile));
-////            }
-////            raf.writeBytes("\n");
-//            raf.writeBytes(currentFiled);
-//            if (givenFileSha1 != null) {
-//                File givenFile = join(BOLBS_DIR, givenFileSha1);
-//                raf.write(readContents(givenFile));
-//            }
-//            raf.writeBytes(givenFiled);
-//
-//            raf.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        byte[] content = readContents(mergeFile);
-//        String sha1 = sha1(content);
-//        writeContents(join(STAGING_AREA_DIR, sha1), content);
-//        stage.put(fileName, sha1);
-
+        String givenFathermsg = "null";
+        if (branchCommit.getParentSha1() != null) {
+            Commit givenFather = getCommit(branchCommit.getParentSha1());
+            givenFathermsg = givenFather.getMessage();
+        }
+        StringBuffer stringBuffer = new StringBuffer(readContentsAsString(log));
+        stringBuffer.append("current branch: " + currentCommit.getMessage() + "\n");
+        stringBuffer.append("sec father: " + secFM + "\n");
+        stringBuffer.append("given branch: " + branchCommit.getMessage() + "\n");
+        stringBuffer.append("givenBranch Father: " + givenFathermsg + "\n");
+        stringBuffer.append("common father: " + commonFatherCommit.getMessage() + "\n");
+        stringBuffer.append("father sha1:" + sha1(serialize(commonFatherCommit)) + "\n\n\n");
+        writeContents(log, stringBuffer.toString());
     }
 
 }

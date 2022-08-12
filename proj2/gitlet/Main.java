@@ -47,7 +47,6 @@ public class Main {
                 repo = Utils.readObject(Repository.CURRENT_REPOSITORY, Repository.class);
                 repo.add(args[1]);
                 break;
-            // TODO: FILL THE REST IN
             case "commit":
                 if (!Repository.GITLET_DIR.exists()) {
                     System.out.println("Not in an initialized Gitlet directory.");
