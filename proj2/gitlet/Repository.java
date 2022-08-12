@@ -559,10 +559,16 @@ public class Repository implements Serializable {
         File mergeFile = join(CWD, fileName);
         RandomAccessFile raf = null;
 
+        String givenContent;
+        if (givenFileSha1 == null) {
+            givenContent = "";
+        } else {
+            givenContent = readContentsAsString(join(BOLBS_DIR, givenFileSha1));
+        }
         String contents = headFiled +
                 readContentsAsString(mergeFile) +
                 currentFiled +
-                readContentsAsString(join(BOLBS_DIR, givenFileSha1)) +
+                givenContent +
                 givenFiled;
         String sha11 = sha1(contents);
         writeContents(join(STAGING_AREA_DIR, sha11), contents);
