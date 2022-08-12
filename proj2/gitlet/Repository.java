@@ -87,33 +87,6 @@ public class Repository implements Serializable {
         stage.put(fileName, sha1);
     }
 
-    public void addReverse(String fileName) {
-        byte[] content = readContents(join(CWD, fileName));
-        String sha1 = sha1(content);
-        for (Map.Entry<String, String> entry: HEAD.bolbs.entrySet()) {
-            if (sha1.equals(entry.getKey())) {
-                return;
-            }
-            // overwrite the same fileName
-//            if (fileName.equals(entry.getValue())) {
-//                lastCommit.bolbs.remove(entry.getKey());
-//            }
-        }
-
-        for (Map.Entry<String, String> entry: stage.entrySet()) {
-            if (sha1.equals(entry.getKey())) {
-                return;
-            }
-            // overwrite the same fileName
-            if (fileName.equals(entry.getValue())) {
-                stage.remove(entry.getKey());
-            }
-        }
-
-        writeContents(join(BOLBS_DIR, sha1), content);
-        stage.put(sha1, fileName);
-    }
-
     public boolean commit(String message) {
         if (stage.size() == 0 && stageRM.size() == 0) {
             System.out.println("No changes added to the commit.");
@@ -255,16 +228,26 @@ public class Repository implements Serializable {
         System.out.println();
 
         System.out.println("=== Untracked Files ===");
+        Set<String> sortUntrackedSet = getUntrackedFile();
+//        for (String CWDFIle: plainFilenamesIn(CWD)) {
+//            if (!HEAD.bolbs.containsKey(CWDFIle) && !stage.containsKey(CWDFIle)) {
+//                sortUntrackedSet.add(CWDFIle);
+//            }
+//        }
+        for (String file: sortUntrackedSet) {
+            System.out.println(file);
+        }
+        System.out.println();
+    }
+
+    private Set<String> getUntrackedFile() {
         Set<String> sortUntrackedSet = new TreeSet<>(Comparator.reverseOrder());
         for (String CWDFIle: plainFilenamesIn(CWD)) {
             if (!HEAD.bolbs.containsKey(CWDFIle) && !stage.containsKey(CWDFIle)) {
                 sortUntrackedSet.add(CWDFIle);
             }
         }
-        for (String file: sortUntrackedSet) {
-            System.out.println(file);
-        }
-        System.out.println();
+        return sortUntrackedSet;
     }
 
     private Set<String> modificationNotStagedSet() {
@@ -452,6 +435,10 @@ public class Repository implements Serializable {
             System.out.println("Cannot merge a branch with itself.");
             return;
         }
+        if (getUntrackedFile().size() == 0) {
+            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            return;
+        }
 
 
         Commit branchCommit = branches.get(branchName);
@@ -466,6 +453,7 @@ public class Repository implements Serializable {
             System.out.println("Current branch fast-forwarded.");
             return;
         }
+
 
         boolean isConflict = processMerge(currentBranchCommit, branchCommit, LCA);
         commit("Merged " + branchName + " into " + currentBranch + ".");
@@ -568,30 +556,6 @@ public class Repository implements Serializable {
         final String currentFiled = "=======\n";
         final String givenFiled = ">>>>>>>\n";
 
-//        byte[] currentContent;
-//        byte[] givenContent;
-//
-//        if (currentFileSha1 == null) {
-//            currentContent = serialize(currentFiled);
-//        } else {
-//            File currentFile = join(BOLBS_DIR, currentFileSha1);
-//            currentContent = concat(readContents(currentFile), serialize(currentFiled));
-//        }
-//
-//        if (givenFileSha1 == null) {
-//            givenContent = serialize(givenFiled);
-//        } else {
-//            File givenFile = join(BOLBS_DIR, givenFileSha1);
-//            givenContent = concat(readContents(givenFile), serialize(givenFiled));
-//        }
-//
-//        byte[] content = concat(currentContent, givenContent);
-//        String sha1 = sha1(content);
-//
-//        writeContents(join(STAGING_AREA_DIR, sha1), content);
-//        stage.put(fileName, sha1);
-//        writeContents(join(CWD, fileName), content);
-
         File mergeFile = join(CWD, fileName);
         RandomAccessFile raf = null;
 
@@ -634,19 +598,6 @@ public class Repository implements Serializable {
 //        writeContents(join(STAGING_AREA_DIR, sha1), content);
 //        stage.put(fileName, sha1);
 
-    }
-
-    private byte[] concat(byte[] A, byte[] B) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            baos.write(A);
-            baos.write(B);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        byte[] C = baos.toByteArray();
-
-        return C;
     }
 
 }
