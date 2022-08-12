@@ -565,7 +565,7 @@ public class Repository implements Serializable {
 
     private void conflict(String currentFileSha1, String givenFileSha1, String fileName) {
         final String headFiled = "<<<<<<< HEAD\n";
-        final String currentFiled = "\n=======\n";
+        final String currentFiled = "=======\n";
         final String givenFiled = ">>>>>>>";
 
 //        byte[] currentContent;
