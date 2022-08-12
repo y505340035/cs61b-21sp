@@ -133,7 +133,7 @@ public class Repository implements Serializable {
 //            }
             addedBolbs.put(entry.getKey(), entry.getValue());
             File stageFile = join(STAGING_AREA_DIR, entry.getValue());
-            if (stageFile.exists()) {
+            if (!join(BOLBS_DIR, entry.getValue()).exists() && stageFile.exists()) {
                 writeContents(join(BOLBS_DIR, entry.getValue()), readContents(stageFile));
             }
         }
@@ -211,7 +211,7 @@ public class Repository implements Serializable {
         String sha1 = Utils.sha1(Utils.serialize(commit));
         System.out.println("===");
         System.out.println("commit " + sha1);
-        Formatter fmt = new Formatter();
+        Formatter fmt = new Formatter(Locale.ENGLISH);
         Date cal = commit.timeStamp;
         fmt.format("%ta %tb %td %tR:%tS %tY %tz", cal, cal, cal, cal, cal, cal, cal);
         System.out.println("Date: " + fmt);
@@ -521,6 +521,7 @@ public class Repository implements Serializable {
                         } else {
 //                            writeContents(join(STAGING_AREA_DIR, bSha1), readContents(join(BOLBS_DIR, bSha1)));
                             stage.put(fileName, bSha1);
+                            writeContents(join(STAGING_AREA_DIR, bSha1), readContents(join(BOLBS_DIR, bSha1)));
                         }
                     } else {
                         conflict(null, branchBlobs.get(fileName), fileName);
@@ -548,12 +549,14 @@ public class Repository implements Serializable {
             if (currentBlobs.containsKey(fileName)) {
                 if (bSha1.equals(currentBlobs.get(fileName))) {
                     stage.put(fileName, bSha1);
+                    writeContents(join(STAGING_AREA_DIR, bSha1), readContents(join(BOLBS_DIR, bSha1)));
                 } else {
                     conflict(null, bSha1, fileName);
                     isConflict = true;
                 }
             } else {
                 stage.put(fileName, bSha1);
+                writeContents(join(STAGING_AREA_DIR, bSha1), readContents(join(BOLBS_DIR, bSha1)));
             }
         }
 
