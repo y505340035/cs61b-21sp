@@ -564,7 +564,8 @@ public class Repository implements Serializable {
     }
 
     private void conflict(String currentFileSha1, String givenFileSha1, String fileName) {
-        final String currentFiled = "=======\n";
+        final String headFiled = "<<<<<<< HEAD\n";
+        final String currentFiled = "\n=======\n";
         final String givenFiled = ">>>>>>>";
 
 //        byte[] currentContent;
@@ -594,43 +595,44 @@ public class Repository implements Serializable {
         File mergeFile = join(CWD, fileName);
         RandomAccessFile raf = null;
 
-//        String contents = readContentsAsString(mergeFile) +
-//                currentFiled +
-//                readContentsAsString(join(BOLBS_DIR, givenFileSha1)) +
-//                givenFiled;
-//        String sha11 = sha1(contents);
-//        writeContents(join(STAGING_AREA_DIR, sha11), contents);
-//        writeContents(mergeFile, contents);
-//        stage.put(fileName, sha11);
-//        return;
+        String contents = headFiled +
+                readContentsAsString(mergeFile) +
+                currentFiled +
+                readContentsAsString(join(BOLBS_DIR, givenFileSha1)) +
+                givenFiled;
+        String sha11 = sha1(contents);
+        writeContents(join(STAGING_AREA_DIR, sha11), contents);
+        writeContents(mergeFile, contents);
+        stage.put(fileName, sha11);
+        return;
 
 
-        try {
-            if (!mergeFile.exists()) {
-                mergeFile.createNewFile();
-            }
-            raf = new RandomAccessFile(mergeFile,"rw");
-            raf.seek(raf.length());
-//            if (currentFileSha1 != null) {
-//                File currentFile = join(BOLBS_DIR, currentFileSha1);
-//                raf.write(readContents(currentFile));
+//        try {
+//            if (!mergeFile.exists()) {
+//                mergeFile.createNewFile();
 //            }
-//            raf.writeBytes("\n");
-            raf.writeBytes(currentFiled);
-            if (givenFileSha1 != null) {
-                File givenFile = join(BOLBS_DIR, givenFileSha1);
-                raf.write(readContents(givenFile));
-            }
-            raf.writeBytes(givenFiled);
-
-            raf.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        byte[] content = readContents(mergeFile);
-        String sha1 = sha1(content);
-        writeContents(join(STAGING_AREA_DIR, sha1), content);
-        stage.put(fileName, sha1);
+//            raf = new RandomAccessFile(mergeFile,"rw");
+//            raf.seek(raf.length());
+////            if (currentFileSha1 != null) {
+////                File currentFile = join(BOLBS_DIR, currentFileSha1);
+////                raf.write(readContents(currentFile));
+////            }
+////            raf.writeBytes("\n");
+//            raf.writeBytes(currentFiled);
+//            if (givenFileSha1 != null) {
+//                File givenFile = join(BOLBS_DIR, givenFileSha1);
+//                raf.write(readContents(givenFile));
+//            }
+//            raf.writeBytes(givenFiled);
+//
+//            raf.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        byte[] content = readContents(mergeFile);
+//        String sha1 = sha1(content);
+//        writeContents(join(STAGING_AREA_DIR, sha1), content);
+//        stage.put(fileName, sha1);
 
     }
 
