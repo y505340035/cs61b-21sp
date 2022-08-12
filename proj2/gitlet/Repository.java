@@ -293,7 +293,7 @@ public class Repository implements Serializable {
     }
 
     public boolean checkout(String commitSha1, String fileName) {
-        if (commitSha1.length() == 5) {
+        if (commitSha1.length() < 20) {
             commitSha1 = useShortId(commitSha1);
             if (commitSha1 == null) {
                 return false;
@@ -640,8 +640,9 @@ public class Repository implements Serializable {
 
     private String useShortId(String id) {
         String fullSha1 = null;
+        int len = id.length();
         for (String fileName: plainFilenamesIn(COMMIT_AREA)) {
-            String sub = fileName.substring(0, 5);
+            String sub = fileName.substring(0, len);
             if (id.equals(sub)) {
                 if (fullSha1 == null) {
                     fullSha1 = fileName;
