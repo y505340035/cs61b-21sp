@@ -54,8 +54,8 @@ public class Repository implements Serializable {
 
         initCommit = new Commit();
         HEAD = initCommit;
-        byte[] initCommitContent = serialize(initCommit);
-        writeContents(join(COMMIT_AREA, sha1(initCommitContent)), initCommitContent);
+//        byte[] initCommitContent = serialize(initCommit);
+//        writeContents(join(COMMIT_AREA, sha1(initCommitContent)), initCommitContent);
         //init branches
         branches = new HashMap<>();
         currentBranch = "master";
@@ -476,13 +476,17 @@ public class Repository implements Serializable {
         }
         AFather.add(sha1(serialize(A)));
 
-        while (!B.parentSha1.equals("")) {
+        while (true) {
             String bSha1 = sha1(serialize(B));
             if (AFather.contains(bSha1)) {
                 File readFile = join(COMMIT_AREA, bSha1);
                 return readObject(readFile, Commit.class);
             }
-            B = getCommit(B.parentSha1);
+            if (!B.parentSha1.equals("")) {
+                B = getCommit(B.parentSha1);
+            } else {
+                break;
+            }
         }
 
         return null;
