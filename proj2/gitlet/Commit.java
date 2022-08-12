@@ -40,8 +40,8 @@ public class Commit implements Serializable {
         Utils.writeObject(Utils.join(Repository.COMMIT_AREA, sha1), this);
     }
 
-    public Commit(Date timeStamp, String message, HashMap<String, String> bolbs, String parentSha1) {
-        this.timeStamp = timeStamp;
+    public Commit(Date ts, String message, HashMap<String, String> bolbs, String parentSha1) {
+        this.timeStamp = ts;
         this.message = message;
         this.bolbs = bolbs;
         this.parentSha1 = parentSha1;

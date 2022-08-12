@@ -314,7 +314,10 @@ public class Repository implements Serializable {
         }
         for (String file:plainFilenamesIn(CWD)) {
             if (!HEAD.getBolbs().containsKey(file)) {
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                String msgA = "There is an untracked file in the way; delete it, ";
+                String msgB = "or add and commit it first.";
+                String msg = msgA + msgB;
+                System.out.println(msg);
                 return false;
             }
         }
@@ -402,7 +405,10 @@ public class Repository implements Serializable {
         Commit commit = getCommit(commitSha1);
         for (String file:plainFilenamesIn(CWD)) {
             if (!HEAD.getBolbs().containsKey(file) && !commit.getBolbs().containsValue(sha1(readContents(join(CWD, file))))) {
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                String msgA = "There is an untracked file in the way; delete it, ";
+                String msgB = "or add and commit it first.";
+                String msg = msgA + msgB;
+                System.out.println(msg);
                 return;
             }
         }
@@ -428,7 +434,10 @@ public class Repository implements Serializable {
             return;
         }
         if (getUntrackedFile().size() != 0) {
-            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            String msgA = "There is an untracked file in the way; delete it, ";
+            String msgB = "or add and commit it first.";
+            String msg = msgA + msgB;
+            System.out.println(msg);
             return;
         }
 
@@ -465,29 +474,29 @@ public class Repository implements Serializable {
     }
 
     private Commit findLatestCommonAncestor(Commit A, Commit B) {
-        Set<String> AFather = new HashSet<>();
+        Set<String> aFather = new HashSet<>();
 
         // process second father
         if (A.getSecParentSha1() != null) {
             Commit secFather = getCommit(A.getSecParentSha1());
-            AFather.add(sha1(serialize(secFather)));
+            aFather.add(sha1(serialize(secFather)));
             while (!secFather.getParentSha1().equals("")) {
                 secFather = getCommit(secFather.getParentSha1());
-                AFather.add(sha1(serialize(secFather)));
+                aFather.add(sha1(serialize(secFather)));
             }
         }
 
         // process first father
         while (!A.getParentSha1().equals("")) {
-            AFather.add(sha1(serialize(A)));
+            aFather.add(sha1(serialize(A)));
             A = getCommit(A.getParentSha1());
         }
-        AFather.add(sha1(serialize(A)));
+        aFather.add(sha1(serialize(A)));
 
 
         while (true) {
             String bSha1 = sha1(serialize(B));
-            if (AFather.contains(bSha1)) {
+            if (aFather.contains(bSha1)) {
                 return getCommit(bSha1);
             }
             if (!B.getParentSha1().equals("")) {
@@ -507,7 +516,7 @@ public class Repository implements Serializable {
         currentBlobs.putAll(currentBranchCommit.getBolbs());
         boolean isConflict = false;
 
-        for(Map.Entry<String, String> entry: ancestorCommit.getBolbs().entrySet()) {
+        for (Map.Entry<String, String> entry: ancestorCommit.getBolbs().entrySet()) {
             String fileName = entry.getKey();
             String bSha1 = branchBlobs.get(fileName);
             String cSha1 = currentBlobs.get(fileName);
