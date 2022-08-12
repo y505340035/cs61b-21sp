@@ -468,7 +468,7 @@ public class Repository implements Serializable {
         }
 
         boolean isConflict = processMerge(currentBranchCommit, branchCommit, LCA);
-        commit("Merged [" + branchName + "] into [" + currentBranch + "].");
+        commit("Merged " + branchName + " into " + currentBranch + ".");
 
         if (isConflict) {
             System.out.println("Encountered a merge conflict.");
