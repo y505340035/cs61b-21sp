@@ -446,6 +446,43 @@ public class Repository implements Serializable {
         Commit branchCommit = branches.get(branchName);
         Commit currentBranchCommit = branches.get(currentBranch);
         Commit LCA = findLatestCommonAncestor(currentBranchCommit, branchCommit);
+
+        File log = join(GITLET_DIR, "log.txt");
+        if (!log.exists()) {
+            try {
+                log.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        String secFM = "null";
+        if (currentBranchCommit.getSecParentSha1() != null) {
+            Commit secFather = getCommit(currentBranchCommit.getSecParentSha1());
+            secFM = secFather.getMessage();
+        }
+
+        String givenFathermsg = "null";
+        if (branchCommit.getParentSha1() != null) {
+            Commit givenFather = getCommit(branchCommit.getParentSha1());
+            givenFathermsg = givenFather.getMessage();
+        }
+        StringBuffer stringBuffer = new StringBuffer(readContentsAsString(log));
+        stringBuffer.append("current branch: " + currentBranchCommit.getMessage() + "\n");
+        stringBuffer.append("sec father: " + secFM + "\n");
+        stringBuffer.append("given branch: " + branchCommit.getMessage() + "\n");
+        stringBuffer.append("givenBranch Father: " + givenFathermsg + "\n");
+        stringBuffer.append("common father: " + LCA.getMessage() + "\n");
+        stringBuffer.append("father sha1:" + sha1(serialize(LCA)) + "\n\n\n");
+
+        writeContents(log, stringBuffer.toString());
+
+//        if (LCA == initCommit) {
+//            try {
+//                join(CWD, "EEEEEEEEEEE").createNewFile();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
         if (sha1(serialize(LCA)).equals(sha1(serialize(branchCommit)))) {
             System.out.println("Given branch is an ancestor of the current branch.");
             return;
@@ -456,9 +493,10 @@ public class Repository implements Serializable {
             return;
         }
 
-
         boolean isConflict = processMerge(currentBranchCommit, branchCommit, LCA);
         commit("Merged " + branchName + " into " + currentBranch + ".");
+        HEAD.setSecParentSha1(sha1(serialize(branchCommit)));
+
 
         if (isConflict) {
             System.out.println("Encountered a merge conflict.");
@@ -470,26 +508,40 @@ public class Repository implements Serializable {
 
     private Commit findLatestCommonAncestor(Commit A, Commit B) {
         Set<String> AFather = new HashSet<>();
+        if (A.getSecParentSha1() != null) {
+
+            File log = join(GITLET_DIR, "log.txt");
+            if (!log.exists()) {
+                try {
+                    log.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            StringBuffer stringBuffer = new StringBuffer(readContentsAsString(log));
+            stringBuffer.append("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+            writeContents(log, stringBuffer.toString());
+
+
+            Commit secFather = getCommit(A.getSecParentSha1());
+            AFather.add(sha1(serialize(secFather)));
+            while (!secFather.getParentSha1().equals("")) {
+                secFather = getCommit(secFather.getParentSha1());
+                AFather.add(sha1(serialize(secFather)));
+            }
+        }
+
         while (!A.getParentSha1().equals("")) {
             AFather.add(sha1(serialize(A)));
             A = getCommit(A.getParentSha1());
         }
         AFather.add(sha1(serialize(A)));
 
-        if (A.getSecParentSha1() != null) {
-            Commit secFather = getCommit(A.getSecParentSha1());
-            while (!secFather.getParentSha1().equals("")) {
-                AFather.add(sha1(serialize(secFather)));
-                secFather = getCommit(secFather.getParentSha1());
-            }
-            AFather.add(sha1(serialize(secFather)));
-        }
 
         while (true) {
             String bSha1 = sha1(serialize(B));
             if (AFather.contains(bSha1)) {
-                File readFile = join(COMMIT_AREA, bSha1);
-                return readObject(readFile, Commit.class);
+                return getCommit(bSha1);
             }
             if (!B.getParentSha1().equals("")) {
                 B = getCommit(B.getParentSha1());
