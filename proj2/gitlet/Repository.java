@@ -54,6 +54,8 @@ public class Repository implements Serializable {
 
         initCommit = new Commit();
         HEAD = initCommit;
+        byte[] initCommitContent = serialize(initCommit);
+        writeContents(join(COMMIT_AREA, sha1(initCommitContent)), initCommitContent);
         //init branches
         branches = new HashMap<>();
         currentBranch = "master";
