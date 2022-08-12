@@ -509,14 +509,14 @@ public class Repository implements Serializable {
         return null;
     }
 
-    private boolean processMerge(Commit currentBranchCommit, Commit givenBranchCommit, Commit ancestorCommit) {
+    private boolean processMerge(Commit cCommit, Commit bCommit, Commit fatherCommit) {
         HashMap<String, String> branchBlobs = new HashMap<>();
-        branchBlobs.putAll(givenBranchCommit.getBolbs());
+        branchBlobs.putAll(bCommit.getBolbs());
         HashMap<String, String> currentBlobs = new HashMap<>();
-        currentBlobs.putAll(currentBranchCommit.getBolbs());
+        currentBlobs.putAll(cCommit.getBolbs());
         boolean isConflict = false;
 
-        for (Map.Entry<String, String> entry: ancestorCommit.getBolbs().entrySet()) {
+        for (Map.Entry<String, String> entry: fatherCommit.getBolbs().entrySet()) {
             String fileName = entry.getKey();
             String bSha1 = branchBlobs.get(fileName);
             String cSha1 = currentBlobs.get(fileName);
@@ -530,9 +530,9 @@ public class Repository implements Serializable {
                                 isConflict = true;
                             }
                         } else {
-//                            writeContents(join(STAGING_AREA_DIR, bSha1), readContents(join(BOLBS_DIR, bSha1)));
                             stage.put(fileName, bSha1);
-                            writeContents(join(CWD, fileName), readContents(join(BOLBS_DIR, bSha1)));
+                            byte[] content = readContents(join(BOLBS_DIR, bSha1));
+                            writeContents(join(CWD, fileName), content);
                         }
                     } else {
                         conflict(null, branchBlobs.get(fileName), fileName);
@@ -595,11 +595,11 @@ public class Repository implements Serializable {
 
         String sha1 = sha1(contents.toString());
         writeContents(join(STAGING_AREA_DIR, sha1), contents.toString());
-        writeContents(mergeFile, contents);
+        writeContents(mergeFile, contents.toString());
         stage.put(fileName, sha1);
     }
 
-    private void generateMyTestLog(Commit currentCommit, Commit branchCommit, Commit commonFatherCommit) {
+    private void generateMyTestLog(Commit cCommit, Commit bCommit, Commit fatherCommit) {
         File log = join(GITLET_DIR, "log.txt");
         if (!log.exists()) {
             try {
@@ -609,23 +609,23 @@ public class Repository implements Serializable {
             }
         }
         String secFM = "null";
-        if (currentCommit.getSecParentSha1() != null) {
-            Commit secFather = getCommit(currentCommit.getSecParentSha1());
+        if (cCommit.getSecParentSha1() != null) {
+            Commit secFather = getCommit(cCommit.getSecParentSha1());
             secFM = secFather.getMessage();
         }
 
         String givenFathermsg = "null";
-        if (branchCommit.getParentSha1() != null) {
-            Commit givenFather = getCommit(branchCommit.getParentSha1());
+        if (bCommit.getParentSha1() != null) {
+            Commit givenFather = getCommit(bCommit.getParentSha1());
             givenFathermsg = givenFather.getMessage();
         }
         StringBuffer stringBuffer = new StringBuffer(readContentsAsString(log));
-        stringBuffer.append("current branch: " + currentCommit.getMessage() + "\n");
+        stringBuffer.append("current branch: " + cCommit.getMessage() + "\n");
         stringBuffer.append("sec father: " + secFM + "\n");
-        stringBuffer.append("given branch: " + branchCommit.getMessage() + "\n");
+        stringBuffer.append("given branch: " + bCommit.getMessage() + "\n");
         stringBuffer.append("givenBranch Father: " + givenFathermsg + "\n");
-        stringBuffer.append("common father: " + commonFatherCommit.getMessage() + "\n");
-        stringBuffer.append("father sha1:" + sha1(serialize(commonFatherCommit)) + "\n\n\n");
+        stringBuffer.append("common father: " + fatherCommit.getMessage() + "\n");
+        stringBuffer.append("father sha1:" + sha1(serialize(fatherCommit)) + "\n\n\n");
         writeContents(log, stringBuffer.toString());
     }
 
