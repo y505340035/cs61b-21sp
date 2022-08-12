@@ -565,7 +565,7 @@ public class Repository implements Serializable {
 
     private void conflict(String currentFileSha1, String givenFileSha1, String fileName) {
         final String currentFiled = "=======\n";
-        final String givenFiled = ">>>>>>>\n";
+        final String givenFiled = ">>>>>>>";
 
 //        byte[] currentContent;
 //        byte[] givenContent;
@@ -594,6 +594,17 @@ public class Repository implements Serializable {
         File mergeFile = join(CWD, fileName);
         RandomAccessFile raf = null;
 
+//        String contents = readContentsAsString(mergeFile) +
+//                currentFiled +
+//                readContentsAsString(join(BOLBS_DIR, givenFileSha1)) +
+//                givenFiled;
+//        String sha11 = sha1(contents);
+//        writeContents(join(STAGING_AREA_DIR, sha11), contents);
+//        writeContents(mergeFile, contents);
+//        stage.put(fileName, sha11);
+//        return;
+
+
         try {
             if (!mergeFile.exists()) {
                 mergeFile.createNewFile();
@@ -604,6 +615,7 @@ public class Repository implements Serializable {
 //                File currentFile = join(BOLBS_DIR, currentFileSha1);
 //                raf.write(readContents(currentFile));
 //            }
+            raf.writeBytes("\n");
             raf.writeBytes(currentFiled);
             if (givenFileSha1 != null) {
                 File givenFile = join(BOLBS_DIR, givenFileSha1);
