@@ -435,7 +435,7 @@ public class Repository implements Serializable {
             System.out.println("Cannot merge a branch with itself.");
             return;
         }
-        if (getUntrackedFile().size() == 0) {
+        if (getUntrackedFile().size() != 0) {
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
             return;
         }
