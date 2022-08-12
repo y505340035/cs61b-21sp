@@ -584,10 +584,10 @@ public class Repository implements Serializable {
         contents.append(givenContent);
         contents.append(givenFiled);
 
-        String sha11 = sha1(contents);
-        writeContents(join(STAGING_AREA_DIR, sha11), contents.toString());
+        String sha1 = sha1(contents.toString());
+        writeContents(join(STAGING_AREA_DIR, sha1), contents.toString());
         writeContents(mergeFile, contents);
-        stage.put(fileName, sha11);
+        stage.put(fileName, sha1);
     }
 
     private void generateMyTestLog(Commit currentCommit, Commit branchCommit, Commit commonFatherCommit) {
