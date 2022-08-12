@@ -571,7 +571,6 @@ public class Repository implements Serializable {
         final String givenFiled = ">>>>>>>\n";
 
         File mergeFile = join(CWD, fileName);
-        RandomAccessFile raf = null;
 
         String givenContent;
         if (givenFileSha1 == null) {
@@ -579,13 +578,14 @@ public class Repository implements Serializable {
         } else {
             givenContent = readContentsAsString(join(BOLBS_DIR, givenFileSha1));
         }
-        String contents = headFiled +
-                readContentsAsString(mergeFile) +
-                currentFiled +
-                givenContent +
-                givenFiled;
+        StringBuffer contents = new StringBuffer(headFiled);
+        contents.append(readContentsAsString(mergeFile));
+        contents.append(currentFiled);
+        contents.append(givenContent);
+        contents.append(givenFiled);
+
         String sha11 = sha1(contents);
-        writeContents(join(STAGING_AREA_DIR, sha11), contents);
+        writeContents(join(STAGING_AREA_DIR, sha11), contents.toString());
         writeContents(mergeFile, contents);
         stage.put(fileName, sha11);
     }
