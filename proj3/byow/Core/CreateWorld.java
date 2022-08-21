@@ -186,7 +186,7 @@ public class CreateWorld {
 
     private void connectRooms(TETile innerTile, TETile wallTile) {
         int i = 0;
-        while (disjointSets.size() != 1 && i < 3333) {
+        while (disjointSets.size() > 1 && i < 3333) {
             int selFatherArray = RandomUtils.uniform(random, disjointSets.size());
             ArrayList<Room> childSet = disjointSets.get(selFatherArray);
             int selection = RandomUtils.uniform(random, childSet.size());
