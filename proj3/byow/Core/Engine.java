@@ -2,6 +2,9 @@ package byow.Core;
 
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import byow.TileEngine.Tileset;
+
+import java.util.Random;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -45,8 +48,17 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
+        input.toLowerCase();
+//        if (input.charAt(0) != 'n') {
+//            return null;
+//        }
+        input = input.substring(1, input.length() - 1);
+        System.out.println(input);
+        Random random = new Random(Integer.parseInt(input));
+        TETile[][] finalWorldFrame = new TETile[WIDTH][HEIGHT];
+        CreateWorld createWorld = new CreateWorld(finalWorldFrame, random);
+        createWorld.createRandomWorld(Tileset.FLOOR, Tileset.WALL);
 
-        TETile[][] finalWorldFrame = null;
         return finalWorldFrame;
     }
 }

@@ -7,9 +7,9 @@ import byow.TileEngine.Tileset;
 import java.util.Random;
 
 public class MyTest {
-    static final int length = 100;
+    static final int length = 120;
     static final int width = 60;
-    static Random random = new Random(111);
+    static Random random = new Random(11);
 
     public static void main(String[] args) {
         TETile[][] world = new TETile[length][width];
@@ -21,13 +21,17 @@ public class MyTest {
         TERenderer teRenderer = new TERenderer();
         teRenderer.initialize(length, width);
 
-        // my test code below this
-        CreateWorld createWorld = new CreateWorld(world);
-//        Position p = new Position(10, 10);
-//        createWorld.drawRoom(world, Tileset.FLOOR, Tileset.WALL, p, 20, 20);
-        createWorld.randomDrawRooms(world, Tileset.FLOOR, Tileset.WALL, random, 30, 40);
+        // my test code below
+        CreateWorld createWorld = new CreateWorld(world, random);
+        createWorld.createRandomWorld(Tileset.FLOOR, Tileset.WALL);
+//        createWorld.testLine(10, 10,Tileset.FLOOR, Tileset.WALL, 3, 3);
+//        createWorld.randomDrawRooms(Tileset.FLOOR, Tileset.WALL, 30, 40);
         // my test code end
 
         teRenderer.renderFrame(world);
+
+//        createWorld.connectRooms(Tileset.FLOOR, Tileset.WALL);
+//        createWorld.createWalls(Tileset.WALL);
+//        teRenderer.renderFrame(world);
     }
 }
