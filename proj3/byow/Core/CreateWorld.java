@@ -3,10 +3,7 @@ package byow.Core;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class CreateWorld {
     private ArrayList<Room> rooms;
@@ -53,7 +50,7 @@ public class CreateWorld {
 
         public boolean randomDetect() {
 
-            for (int i = 0; i < 999; i++) {
+            for (int i = 0; i < 99; i++) {
                 // down right up left
                 int direction = RandomUtils.uniform(random, 4);
                 int selection;
@@ -196,6 +193,7 @@ public class CreateWorld {
                     break;
                 }
             }
+            System.out.println("set number " + disjointSets.size() + "\nrun times: " + i);
             i ++;
         }
 
