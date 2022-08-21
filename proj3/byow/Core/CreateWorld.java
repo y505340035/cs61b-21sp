@@ -146,7 +146,7 @@ public class CreateWorld {
     }
 
     public void createRandomWorld(TETile innerTile, TETile wallTile) {
-        randomDrawRooms(innerTile, wallTile, 15, 30);
+        randomDrawRooms(innerTile, wallTile, 20, 40);
         connectRooms(innerTile, wallTile);
         createWalls(wallTile);
     }
@@ -161,8 +161,8 @@ public class CreateWorld {
         rooms = new ArrayList<>();
 
         while (existRoom < roomNumLimit) {
-            int randomLen = 1 + RandomUtils.uniform(random, 5);
-            int randomHei = 1 + RandomUtils.uniform(random, 5);
+            int randomLen = 1 + RandomUtils.uniform(random, 6);
+            int randomHei = 1 + RandomUtils.uniform(random, 6);
 
             int randomX = 1 + RandomUtils.uniform(random, worldLen - randomLen - 1);
             int randomY = 1 + RandomUtils.uniform(random, worldHei - randomHei - 1);

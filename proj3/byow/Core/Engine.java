@@ -54,7 +54,7 @@ public class Engine {
 //        }
         input = input.substring(1, input.length() - 1);
         System.out.println(input);
-        Random random = new Random(Integer.parseInt(input));
+        Random random = new Random(Long.parseLong(input));
         TETile[][] finalWorldFrame = new TETile[WIDTH][HEIGHT];
         CreateWorld createWorld = new CreateWorld(finalWorldFrame, random);
         createWorld.createRandomWorld(Tileset.FLOOR, Tileset.WALL);
