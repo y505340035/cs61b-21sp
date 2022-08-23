@@ -16,7 +16,7 @@ public class Engine {
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
     private static final String CWD =  "./byow/";
-    private static final File SAVE_FOLDER =  Utils.join(CWD, "save");
+    private static final File SAVE_FOLDER =  new File("./");
     TERenderer teRenderer;
     InputSource inputDevice;
     Position avatar;
@@ -160,9 +160,9 @@ public class Engine {
 
     private void save(String s) {
 //        SAVE_FOLDER.setExecutable(true);
-        if (!SAVE_FOLDER.exists()) {
-            SAVE_FOLDER.mkdir();
-        }
+//        if (!SAVE_FOLDER.exists()) {
+//            SAVE_FOLDER.mkdir();
+//        }
         File saveFile = Utils.join(SAVE_FOLDER, s + ".txt");
         Utils.writeObject(saveFile, avatar);
 //        System.out.println("\n\nX: " + avatar.getX() + "\nY: " + avatar.getY());
