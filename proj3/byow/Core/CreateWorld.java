@@ -2,6 +2,7 @@ package byow.Core;
 
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
+import edu.princeton.cs.algs4.TST;
 
 import java.util.*;
 
@@ -142,10 +143,29 @@ public class CreateWorld {
 
     }
 
-    public void createRandomWorld(TETile innerTile, TETile wallTile) {
+    public Position createRandomWorld(TETile innerTile, TETile wallTile) {
         randomDrawRooms(innerTile, wallTile, 20, 40);
         connectRooms(innerTile, wallTile);
         createWalls(wallTile);
+        Position p = createTheBoy(Tileset.AVATAR);
+        makeChangeDone();
+        return p;
+    }
+
+    private Position createTheBoy(TETile tile) {
+        final int worldLen = tileWorld.length;
+        final int worldHei = tileWorld[0].length;
+
+        while (true) {
+            int x = RandomUtils.uniform(random, worldLen);
+            int y = RandomUtils.uniform(random, worldHei);
+
+            Point p = getPoint(x, y);
+            if (p.tile == Tileset.FLOOR) {
+                p.tile = tile;
+                return new Position(x, y);
+            }
+        }
     }
 
     private void randomDrawRooms(TETile innerTile, TETile wallTile, int minNum, int maxNum) {
@@ -197,7 +217,7 @@ public class CreateWorld {
             i ++;
         }
 
-        makeChangeDone();
+//        makeChangeDone();
     }
 
     private void createWalls(TETile wallTile) {

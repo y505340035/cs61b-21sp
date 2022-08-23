@@ -76,7 +76,7 @@ public class MemoryGame {
         StdDraw.clear(StdDraw.BLACK);
         StdDraw.text(20, 20, s);
 
-        //TODO: If game is not over, display relevant game information at the top of the screen
+        // If game is not over, display relevant game information at the top of the screen
         if (!gameOver) {
             StdDraw.setFont(new Font("myFont", Font.CENTER_BASELINE, 18));
             StdDraw.textLeft(1, 39, "Round: " + round);
