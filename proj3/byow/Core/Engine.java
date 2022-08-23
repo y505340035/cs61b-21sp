@@ -159,7 +159,7 @@ public class Engine {
     }
 
     private void save(String s) {
-        SAVE_FOLDER.setExecutable(true);
+//        SAVE_FOLDER.setExecutable(true);
         if (!SAVE_FOLDER.exists()) {
             SAVE_FOLDER.mkdir();
         }
