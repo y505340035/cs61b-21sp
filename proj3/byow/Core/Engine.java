@@ -15,7 +15,7 @@ public class Engine {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
-    private static final String CWD =  System.getProperty("user.dir");
+    private static final String CWD =  "./byow/";
     private static final File SAVE_FOLDER =  Utils.join(CWD, "save");
     TERenderer teRenderer;
     InputSource inputDevice;
@@ -159,6 +159,7 @@ public class Engine {
     }
 
     private void save(String s) {
+        SAVE_FOLDER.setExecutable(true);
         if (!SAVE_FOLDER.exists()) {
             SAVE_FOLDER.mkdir();
         }
