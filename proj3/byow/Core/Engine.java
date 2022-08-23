@@ -18,8 +18,14 @@ public class Engine {
     Position avatar;
 
     public Engine() {
-        teRenderer = new TERenderer();
-        teRenderer.initialize(WIDTH, HEIGHT);
+        teRenderer = null;
+    }
+
+    public Engine(boolean graph) {
+        if (graph) {
+            teRenderer = new TERenderer();
+            teRenderer.initialize(WIDTH, HEIGHT);
+        }
     }
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
@@ -54,13 +60,17 @@ public class Engine {
 
     private TETile[][] newGame() {
         String s = "n";
-        drawFrame(s);
+        if (teRenderer != null) {
+            drawFrame(s);
+        }
 
         while (true) {
             char c = inputDevice.getNextKey();
             if (Character.isDigit(c)) {
                 s = s + c;
-                drawFrame(s);
+                if (teRenderer != null) {
+                    drawFrame(s);
+                }
             } else if (c == 's') {
                 s = s + c;
 //                interactWithInputString(s);
@@ -143,7 +153,9 @@ public class Engine {
         TETile[][] finalWorldFrame = new TETile[WIDTH][HEIGHT];
         CreateWorld createWorld = new CreateWorld(finalWorldFrame, random);
         avatar = createWorld.createRandomWorld(Tileset.FLOOR, Tileset.WALL);
-        teRenderer.renderFrame(finalWorldFrame);
+        if (teRenderer != null) {
+            teRenderer.renderFrame(finalWorldFrame);
+        }
         finalWorldFrame = continueGame(finalWorldFrame);
 
         return finalWorldFrame;
@@ -177,7 +189,9 @@ public class Engine {
             setPoint(world, dp, Tileset.AVATAR);
             setPoint(world, p, Tileset.FLOOR);
             avatar = dp;
-            teRenderer.renderFrame(world);
+            if (teRenderer != null) {
+                teRenderer.renderFrame(world);
+            }
         }
     }
 
