@@ -54,8 +54,7 @@ public class Engine {
                     world = newGame();
                     return continueGame(world);
                 case 'l':
-                    world = newGame();
-                    load(world, seed);
+                    world = load();
                     return continueGame(world);
                 case 'q':
                     System.exit(0);
@@ -162,22 +161,30 @@ public class Engine {
 //        if (!SAVE_FOLDER.exists()) {
 //            SAVE_FOLDER.mkdir();
 //        }
-        File saveFile = Utils.join(SAVE_FOLDER, s + ".txt");
+        File saveFile = Utils.join(SAVE_FOLDER,  "saveAva.txt");
         Utils.writeObject(saveFile, avatar);
+        File saveSeed = Utils.join(SAVE_FOLDER,  "saveSeed.txt");
+        Utils.writeContents(saveSeed, s);
 //        System.out.println("\n\nX: " + avatar.getX() + "\nY: " + avatar.getY());
     }
 
-    private void load(TETile[][] world, String s) {
-        File loadFile = Utils.join(SAVE_FOLDER, s + ".txt");
-        if (loadFile.exists()) {
+    private TETile[][] load() {
+        TETile[][] world = null;
+        File saveSeed = Utils.join(SAVE_FOLDER,  "saveSeed.txt");
+        String s = Utils.readContentsAsString(saveSeed);
+        File saveFile = Utils.join(SAVE_FOLDER,  "saveAva.txt");
+
+        world = getWorldWithString(s);
+        if (saveFile.exists()) {
             setPoint(world, avatar, Tileset.FLOOR);
-            avatar = Utils.readObject(loadFile, Position.class);
+            avatar = Utils.readObject(saveFile, Position.class);
 //            System.out.println("\n\nX: " + avatar.getX() + "\nY: " + avatar.getY());
             setPoint(world, avatar, Tileset.AVATAR);
             if (teRenderer != null) {
                 teRenderer.renderFrame(world);
             }
         }
+        return world;
     }
 
     private TETile[][] getWorldWithString(String input) {
