@@ -7,19 +7,19 @@ import byow.TileEngine.Tileset;
 import java.util.Random;
 
 public class MyTest {
-    static final int length = 120;
-    static final int width = 60;
+    static final int LENGTH = 120;
+    static final int WIDTH = 60;
     static Random random = new Random(11);
 
     public static void main(String[] args) {
-        TETile[][] world = new TETile[length][width];
-        for (int x = 0; x < length; x++) {
-            for (int y = 0; y < width; y++) {
+        TETile[][] world = new TETile[LENGTH][WIDTH];
+        for (int x = 0; x < LENGTH; x++) {
+            for (int y = 0; y < WIDTH; y++) {
                 world[x][y] = Tileset.NOTHING;
             }
         }
         TERenderer teRenderer = new TERenderer();
-        teRenderer.initialize(length, width);
+        teRenderer.initialize(LENGTH, WIDTH);
 
         // my test code below
         CreateWorld createWorld = new CreateWorld(world, random);

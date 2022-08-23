@@ -3,7 +3,6 @@ package byow.Core;
 /**
  * Created by hug.
  */
-import byow.Core.InputSource;
 import edu.princeton.cs.introcs.StdDraw;
 
 public class KeyboardInputSource implements InputSource {

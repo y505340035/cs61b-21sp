@@ -1,7 +1,10 @@
 package byow.Core;
 
-public class Position {
+import java.io.Serializable;
+
+public class Position implements Serializable {
     private int x;
+    private int y;
 
     public int getX() {
         return x;
@@ -11,14 +14,12 @@ public class Position {
         return y;
     }
 
-    private int y;
-
     public Position(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public Position shift(int dx, int dy){
+    public Position shift(int dx, int dy) {
         return new Position(x + dx, y + dy);
     }
 

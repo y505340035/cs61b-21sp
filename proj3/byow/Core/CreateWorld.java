@@ -2,7 +2,6 @@ package byow.Core;
 
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
-import edu.princeton.cs.algs4.TST;
 
 import java.util.*;
 
@@ -42,7 +41,7 @@ public class CreateWorld {
         Point p;
         ArrayList<Room> disjointSet;
 
-        public Room(int length, int height, Point p, ArrayList<Room> friends) {
+        Room(int length, int height, Point p, ArrayList<Room> friends) {
             this.length = length;
             this.height = height;
             this.p = p;
@@ -83,8 +82,12 @@ public class CreateWorld {
                         ray(selP, -1, 0);
                         dx = -1;
                         break;
+                    default:
+                        break;
                 }
-                if (ray(selP, dx, dy)) { return true; }
+                if (ray(selP, dx, dy)) {
+                    return true;
+                }
             }
             return false;
         }
@@ -127,7 +130,7 @@ public class CreateWorld {
         return pointsMap[x][y];
     }
 
-    public CreateWorld (TETile[][] world, Random random) {
+    public CreateWorld(TETile[][] world, Random random) {
         int len = world.length;
         int hei = world[0].length;
         pointsMap = new Point[len][hei];
@@ -194,7 +197,7 @@ public class CreateWorld {
                 disjointSets.add(roomSet);
                 registerRect(randomP, randomLen, randomHei, room);
                 rooms.add(room);
-                existRoom ++;
+                existRoom++;
             }
         }
 
@@ -208,13 +211,13 @@ public class CreateWorld {
             ArrayList<Room> childSet = disjointSets.get(selFatherArray);
             int selection = RandomUtils.uniform(random, childSet.size());
             Room selRoom = childSet.get(selection);
-            for (int j = 0; j < 20; j++ ) {
+            for (int j = 0; j < 20; j++) {
                 if (selRoom.randomDetect()) {
                     break;
                 }
             }
             System.out.println("set number " + disjointSets.size() + "\nrun times: " + i);
-            i ++;
+            i++;
         }
 
 //        makeChangeDone();
@@ -266,7 +269,9 @@ public class CreateWorld {
      * Position p in the left bottom conner of the room.
      */
     public void drawRoom(TETile innerTile, TETile wallTile, Point p, int length, int height) {
-        if (length < 3 || height < 3) { return; }
+        if (length < 3 || height < 3) {
+            return;
+        }
         drawOutline(wallTile, p, length, height);
         p = p.nextPoint(1, 1);
         drawRectangle(innerTile, p, length - 2, height - 2);
@@ -297,8 +302,8 @@ public class CreateWorld {
         drawColumn(tile, p, height);
 
         p = p.nextPoint(length - 1, height - 1);
-        drawRow(tile, p, - length);
-        drawColumn(tile, p, - height);
+        drawRow(tile, p, -length);
+        drawColumn(tile, p, -height);
     }
 
     private void drawRectangle(TETile tile, Point p, int length, int height) {

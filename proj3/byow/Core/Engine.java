@@ -6,6 +6,7 @@ import byow.TileEngine.Tileset;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
+import java.io.File;
 import java.util.Random;
 
 public class Engine {
@@ -16,6 +17,7 @@ public class Engine {
     TERenderer teRenderer;
     InputSource inputDevice;
     Position avatar;
+    String seed;
 
     public Engine() {
         teRenderer = null;
@@ -40,17 +42,23 @@ public class Engine {
     private TETile[][] startMenu() {
 //        drawFirstView();
         boolean flag = true;
+        TETile[][] world;
 
         while (flag) {
             char c = inputDevice.getNextKey();
             System.out.println(c);
             switch (c) {
                 case 'n':
-                    return newGame();
+                    world = newGame();
+                    return continueGame(world);
                 case 'l':
-                    break;
+                    world = newGame();
+                    load(world, seed);
+                    return continueGame(world);
                 case 'q':
-
+                    System.exit(0);
+                    break;
+                default:
                     break;
             }
         }
@@ -142,11 +150,38 @@ public class Engine {
         // that works for many different input types.
         input.toLowerCase();
         inputDevice = new StringInputDevice(input);
-        return startMenu();
+        TETile[][] finalWorld = startMenu();
+        save(seed);
+        return finalWorld;
+    }
+
+    private void save(String s) {
+        File saveFolder = new File("./.byow");
+        if (!saveFolder.exists()) {
+            saveFolder.mkdir();
+        }
+        File saveFile = Utils.join(saveFolder, s + ".txt");
+        Utils.writeObject(saveFile, avatar);
+        System.out.println("\n\nX: " + avatar.getX() + "\nY: " + avatar.getY());
+    }
+
+    private void load(TETile[][] world, String s) {
+        File loadFolder = new File("./.byow");
+        File loadFile = Utils.join(loadFolder, s + ".txt");
+        if (loadFile.exists()) {
+            setPoint(world, avatar, Tileset.FLOOR);
+            avatar = Utils.readObject(loadFile, Position.class);
+            System.out.println("\n\nX: " + avatar.getX() + "\nY: " + avatar.getY());
+            setPoint(world, avatar, Tileset.AVATAR);
+            if (teRenderer != null) {
+                teRenderer.renderFrame(world);
+            }
+        }
     }
 
     private TETile[][] getWorldWithString(String input) {
         input.toLowerCase();
+        seed = input;
         input = input.substring(1, input.length() - 1);
         System.out.println(input);
         Random random = new Random(Long.parseLong(input));
@@ -156,7 +191,6 @@ public class Engine {
         if (teRenderer != null) {
             teRenderer.renderFrame(finalWorldFrame);
         }
-        finalWorldFrame = continueGame(finalWorldFrame);
 
         return finalWorldFrame;
     }
@@ -164,7 +198,8 @@ public class Engine {
 
     private TETile[][] continueGame(TETile[][] world) {
         while (inputDevice.possibleNextInput()) {
-            char c = inputDevice.getNextKey();
+            char c = Character.toLowerCase(inputDevice.getNextKey());
+            System.out.println("Press: " + c);
             switch (c) {
                 case 'w':
                     move(world, avatar, 0, 1);
@@ -178,6 +213,8 @@ public class Engine {
                 case 'd':
                     move(world, avatar, 1, 0);
                     break;
+                default:
+                    break;
             }
         }
         return world;
@@ -189,6 +226,7 @@ public class Engine {
             setPoint(world, dp, Tileset.AVATAR);
             setPoint(world, p, Tileset.FLOOR);
             avatar = dp;
+            System.out.println("\n\nX: " + avatar.getX() + "\nY: " + avatar.getY());
             if (teRenderer != null) {
                 teRenderer.renderFrame(world);
             }
