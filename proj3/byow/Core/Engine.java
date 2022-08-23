@@ -27,11 +27,12 @@ public class Engine {
      */
     public TETile[][] interactWithKeyboard() {
         inputDevice = new KeyboardInputSource();
+        drawFirstView();
         return startMenu();
     }
 
     private TETile[][] startMenu() {
-        drawFirstView();
+//        drawFirstView();
         boolean flag = true;
 
         while (flag) {
