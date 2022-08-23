@@ -216,7 +216,7 @@ public class CreateWorld {
                     break;
                 }
             }
-            System.out.println("set number " + disjointSets.size() + "\nrun times: " + i);
+//            System.out.println("set number " + disjointSets.size() + "\nrun times: " + i);
             i++;
         }
 

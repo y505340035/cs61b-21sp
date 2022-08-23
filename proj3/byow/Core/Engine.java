@@ -15,7 +15,8 @@ public class Engine {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
-    private static final String SAVE_FOLDER = "./save";
+    private static final String CWD =  System.getProperty("user.dir");
+    private static final File SAVE_FOLDER =  Utils.join(CWD, "save");
     TERenderer teRenderer;
     InputSource inputDevice;
     Position avatar;
@@ -158,18 +159,16 @@ public class Engine {
     }
 
     private void save(String s) {
-        File saveFolder = new File(SAVE_FOLDER);
-        if (!saveFolder.exists()) {
-            saveFolder.mkdir();
+        if (!SAVE_FOLDER.exists()) {
+            SAVE_FOLDER.mkdir();
         }
-        File saveFile = Utils.join(saveFolder, s + ".txt");
+        File saveFile = Utils.join(SAVE_FOLDER, s + ".txt");
         Utils.writeObject(saveFile, avatar);
 //        System.out.println("\n\nX: " + avatar.getX() + "\nY: " + avatar.getY());
     }
 
     private void load(TETile[][] world, String s) {
-        File loadFolder = new File(SAVE_FOLDER);
-        File loadFile = Utils.join(loadFolder, s + ".txt");
+        File loadFile = Utils.join(SAVE_FOLDER, s + ".txt");
         if (loadFile.exists()) {
             setPoint(world, avatar, Tileset.FLOOR);
             avatar = Utils.readObject(loadFile, Position.class);
