@@ -3,7 +3,9 @@ package byow.Core;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
+import edu.princeton.cs.introcs.StdDraw;
 
+import java.awt.*;
 import java.util.Random;
 
 public class Engine {
@@ -11,13 +13,92 @@ public class Engine {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
+    TERenderer teRenderer;
+    InputSource inputDevice;
+    Position avatar;
 
+    public Engine() {
+        teRenderer = new TERenderer();
+        teRenderer.initialize(WIDTH, HEIGHT);
+    }
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
      */
-    public void interactWithKeyboard() {
+    public TETile[][] interactWithKeyboard() {
+        inputDevice = new KeyboardInputSource();
+        return startMenu();
     }
+
+    private TETile[][] startMenu() {
+        drawFirstView();
+        boolean flag = true;
+
+        while (flag) {
+            char c = inputDevice.getNextKey();
+            System.out.println(c);
+            switch (c) {
+                case 'n':
+                    return newGame();
+                case 'l':
+                    break;
+                case 'q':
+
+                    break;
+            }
+        }
+        return null;
+
+    }
+
+    private TETile[][] newGame() {
+        String s = "n";
+        drawFrame(s);
+
+        while (true) {
+            char c = inputDevice.getNextKey();
+            if (Character.isDigit(c)) {
+                s = s + c;
+                drawFrame(s);
+            } else if (c == 's') {
+                s = s + c;
+//                interactWithInputString(s);
+                TETile[][] world = getWorldWithString(s);
+                return world;
+            }
+        }
+
+
+    }
+
+    private void drawFirstView() {
+        StdDraw.setCanvasSize(this.WIDTH * 16, this.HEIGHT * 16);
+        Font font = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(font);
+        StdDraw.setXscale(0, this.WIDTH);
+        StdDraw.setYscale(0, this.HEIGHT);
+        StdDraw.clear(Color.BLACK);
+        StdDraw.enableDoubleBuffering();
+
+        StdDraw.setPenColor(StdDraw.LIGHT_GRAY);
+        StdDraw.text(WIDTH / 2, HEIGHT / 6 * 5, "CS61B: THE GAME");
+        StdDraw.text(WIDTH / 2, HEIGHT / 2 + 5, "New Game (N)");
+        StdDraw.text(WIDTH / 2, HEIGHT / 2, "Load Game (L)");
+        StdDraw.text(WIDTH / 2, HEIGHT / 2 - 5, "Quit (Q)");
+        StdDraw.show();
+    }
+
+    private void drawFrame(String s) {
+        StdDraw.setPenColor(StdDraw.LIGHT_GRAY);
+//        Font font = new Font("myFont", Font.BOLD, 30);
+//        StdDraw.setFont(font);
+        StdDraw.clear(StdDraw.BLACK);
+        StdDraw.text(WIDTH / 2, HEIGHT / 2, s);
+        StdDraw.show();
+    }
+
+
+
 
     /**
      * Method used for autograding and testing your code. The input string will be a series
@@ -41,7 +122,7 @@ public class Engine {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
-        // TODO: Fill out this method so that it run the engine using the input
+        // Fill out this method so that it run the engine using the input
         // passed in as an argument, and return a 2D tile representation of the
         // world that would have been drawn if the same inputs had been given
         // to interactWithKeyboard().
@@ -49,16 +130,61 @@ public class Engine {
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
         input.toLowerCase();
-//        if (input.charAt(0) != 'n') {
-//            return null;
-//        }
+        inputDevice = new StringInputDevice(input);
+        return startMenu();
+    }
+
+    private TETile[][] getWorldWithString(String input) {
+        input.toLowerCase();
         input = input.substring(1, input.length() - 1);
         System.out.println(input);
         Random random = new Random(Long.parseLong(input));
         TETile[][] finalWorldFrame = new TETile[WIDTH][HEIGHT];
         CreateWorld createWorld = new CreateWorld(finalWorldFrame, random);
-        createWorld.createRandomWorld(Tileset.FLOOR, Tileset.WALL);
+        avatar = createWorld.createRandomWorld(Tileset.FLOOR, Tileset.WALL);
+        teRenderer.renderFrame(finalWorldFrame);
+        finalWorldFrame = continueGame(finalWorldFrame);
 
         return finalWorldFrame;
+    }
+
+
+    private TETile[][] continueGame(TETile[][] world) {
+        while (inputDevice.possibleNextInput()) {
+            char c = inputDevice.getNextKey();
+            switch (c) {
+                case 'w':
+                    move(world, avatar, 0, 1);
+                    break;
+                case 'a':
+                    move(world, avatar, -1, 0);
+                    break;
+                case 's':
+                    move(world, avatar, 0, -1);
+                    break;
+                case 'd':
+                    move(world, avatar, 1, 0);
+                    break;
+            }
+        }
+        return world;
+    }
+
+    private void move(TETile[][] world, Position p, int dx, int dy) {
+        Position dp = p.shift(dx, dy);
+        if (dp.inTheMap(WIDTH, HEIGHT) && getPoint(world, dp) == Tileset.FLOOR) {
+            setPoint(world, dp, Tileset.AVATAR);
+            setPoint(world, p, Tileset.FLOOR);
+            avatar = dp;
+            teRenderer.renderFrame(world);
+        }
+    }
+
+    private TETile getPoint(TETile[][] world, Position p) {
+        return world[p.getX()][p.getY()];
+    }
+
+    private void setPoint(TETile[][] world, Position p, TETile tile) {
+        world[p.getX()][p.getY()] = tile;
     }
 }
