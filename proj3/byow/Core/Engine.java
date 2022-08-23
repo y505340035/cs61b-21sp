@@ -4,7 +4,6 @@ import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 import edu.princeton.cs.introcs.StdDraw;
-import org.apache.commons.collections.StaticBucketMap;
 
 import java.awt.*;
 import java.io.File;
